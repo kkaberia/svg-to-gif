@@ -31,6 +31,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from itsdangerous import URLSafeTimedSerializer
 from flask import jsonify
+from flask import Flask, render_template
 
 
 app = Flask(__name__)
@@ -161,8 +162,8 @@ class Payment(db.Model):
 # Utility Functions
 # ---------------------------
 
-def generate_random_password(length=12):
-    characters = string.ascii_letters + string.digits + string.punctuation
+def generate_random_password(length=8):
+    characters = string.ascii_letters + string.digits #+ string.punctuation
     return ''.join(secrets.choice(characters) for _ in range(length))
 
 def send_password_email(email, username, password):
@@ -206,7 +207,7 @@ def admin_required(f):
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return "Flask app is running!"
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
