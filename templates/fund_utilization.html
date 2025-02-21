@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fund Utilization - Estate Portal</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Navigation Bar */
+    nav {
+      background-color: #2c3e50;
+      padding: 15px 20px;
+      text-align: center;
+      margin-bottom: 30px;
+      width: 100%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: 500;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #3498db;
+    }
+
+    /* Fund Utilization Container */
+    .fund-utilization-container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    /* Summary Section */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .summary-item {
+      background-color: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .summary-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .summary-item strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: #555;
+    }
+
+    .summary-item span {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #3498db;
+    }
+
+    /* Add Transaction Button */
+    .add-transaction-btn {
+      background-color: #3498db;
+      color: #fff;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .add-transaction-btn:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+    }
+
+    /* Form Grid Layout */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+      display: none; /* Hide form by default */
+    }
+
+    .form-grid.visible {
+      display: grid; /* Show form when toggled */
+    }
+
+    .form-group {
+      display: contents; /* Makes the label and input part of the grid */
+    }
+
+    label {
+      font-weight: 500;
+      text-align: left;
+      color: #333;
+    }
+
+    input[type="date"],
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="date"]:focus,
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    input[type="submit"] {
+      grid-column: span 2; /* Make the submit button span both columns */
+      background-color: #2c3e50;
+      color: #fff;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      font-weight: 500;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #34495e;
+      transform: translateY(-2px);
+    }
+
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #2c3e50;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    /* Flash Messages */
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    /* Edit Button */
+    .edit-btn {
+      background-color: #3498db;
+      color: #fff;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .edit-btn:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav>
+    <a href="{{ url_for('home') }}">Home</a> |
+    <a href="{{ url_for('login') }}">Login</a> |
+    <a href="{{ url_for('dashboard') }}">Dashboard</a> |
+    <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </nav>
+
+  <!-- Fund Utilization Container -->
+  <div class="fund-utilization-container">
+    <h1>Outgoing Payment - Bank Debits</h1>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Summary Section -->
+    <div class="summary">
+      <div class="summary-item">
+        <strong>Total Outgoing Payments</strong>
+        <span>KSH {{ total_debits }}</span>
+      </div>
+    </div>
+
+    <!-- Add Transaction Button -->
+    <button class="add-transaction-btn" onclick="toggleForm()">Add Outgoing Payment</button>
+
+    <!-- Fund Utilization Form -->
+    <form action="{{ url_for('fund_utilization') }}" method="post" class="form-grid" id="transaction-form">
+      <input type="hidden" id="transaction_id" name="transaction_id" value="">
+      <div class="form-group">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+      <div class="form-group">
+        <label for="narration">Narration/Description:</label>
+        <input type="text" id="narration" name="narration" required>
+      </div>
+      <div class="form-group">
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label for="payment_mode">Payment Mode:</label>
+        <select id="payment_mode" name="payment_mode">
+          <option value="Cash">Cash</option>
+          <option value="Bank Transfer">Bank Transfer</option>
+          <option value="Cheque">Cheque</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="payee">Payee:</label>
+        <input type="text" id="payee" name="payee" required>
+      </div>
+      <input type="submit" value="Add Transaction">
+    </form>
+
+    <!-- Bank Transactions Table -->
+    <h2>Outgoing Payments Transactions</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Narration</th>
+          <th>Amount</th>
+          <th>Payment Mode</th>
+          <th>Payee</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for transaction in transactions %}
+        <tr>
+          <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ transaction.narration }}</td>
+          <td>KSH {{ transaction.amount }}</td>
+          <td>{{ transaction.payment_mode }}</td>
+          <td>{{ transaction.payee }}</td>
+          <td>
+            <button class="edit-btn" onclick="editTransaction({{ transaction.id }})">Edit</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- JavaScript to Toggle Form Visibility and Handle Editing -->
+  <script>
+    function toggleForm() {
+      const form = document.querySelector('.form-grid');
+      form.classList.toggle('visible');
+      // Reset form when toggling for adding new transaction
+      if (!form.classList.contains('visible')) {
+        document.getElementById('transaction-form').reset();
+        document.getElementById('transaction_id').value = '';
+        document.querySelector('input[type="submit"]').value = 'Add Transaction';
+        document.getElementById('transaction-form').action = "{{ url_for('fund_utilization') }}";
+      }
+    }
+
+    function editTransaction(transactionId) {
+      fetch(`/get_transaction/${transactionId}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('transaction_id').value = data.id;
+          document.getElementById('date').value = data.date;
+          document.getElementById('narration').value = data.narration;
+          document.getElementById('amount').value = data.amount;
+          document.getElementById('payment_mode').value = data.payment_mode;
+          document.getElementById('payee').value = data.payee;
+
+          // Update the form action and submit button text
+          const form = document.getElementById('transaction-form');
+          form.action = `/edit_transaction/${transactionId}`;
+          form.querySelector('input[type="submit"]').value = 'Update Transaction';
+
+          // Show the form
+          toggleForm();
+        })
+        .catch(error => console.error('Error fetching transaction:', error));
+    }
+  </script>
+</body>
+</html>

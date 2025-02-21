@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add User - Estate Portal</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Navigation Bar */
+    nav {
+      background-color: #2c3e50;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+    }
+
+    nav a {
+      color: #ecf0f1;
+      text-decoration: none;
+      margin: 0 1rem;
+      font-weight: 500;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #3498db;
+    }
+
+    nav a.active {
+      font-weight: bold;
+      color: #3498db;
+    }
+
+    /* Add User Container */
+    .add-user-container {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #2c3e50;
+      font-weight: 700;
+    }
+
+    /* Form Grid Layout */
+    .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* First column for labels, second for inputs */
+  gap: 1.5rem;
+  align-items: center; /* Align labels and inputs vertically */
+}
+
+.form-group {
+  display: contents; /* Use the grid layout for form groups */
+}
+
+    label {
+      font-weight: 500;
+      text-align: left;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    input[type="submit"] {
+      background-color: #3498db;
+      color: #fff;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      font-weight: 500;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+    }
+
+    .error-message {
+      color: #ff4d4d;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-top: 0.25rem;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav>
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('update_payment') }}">Update Payment</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </nav>
+
+  <!-- Add User Container -->
+  <div class="add-user-container">
+    <h1>Add New User</h1>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Add User Form -->
+    <form action="{{ url_for('add_user') }}" method="post">
+      {{ form.hidden_tag() }}
+
+      <div class="form-grid">
+        <div class="form-group">
+          {{ form.username.label(class="form-label") }}
+          {{ form.username(class="form-control") }}
+          {% for error in form.username.errors %}
+            <div class="error-message">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          {{ form.first_name.label(class="form-label") }}
+          {{ form.first_name(class="form-control") }}
+          {% for error in form.first_name.errors %}
+            <div class="error-message">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          {{ form.last_name.label(class="form-label") }}
+          {{ form.last_name(class="form-control") }}
+          {% for error in form.last_name.errors %}
+            <div class="error-message">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          {{ form.email.label(class="form-label") }}
+          {{ form.email(class="form-control", type="email") }}
+          {% for error in form.email.errors %}
+            <div class="error-message">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          {{ form.house_number.label(class="form-label") }}
+          {{ form.house_number(class="form-control") }}
+          {% for error in form.house_number.errors %}
+            <div class="error-message">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          {{ form.family_name.label(class="form-label") }}
+          {{ form.family_name(class="form-control") }}
+          {% for error in form.family_name.errors %}
+            <div class="error-message">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <input type="submit" value="Add User">
+      </div>
+    </form>
+  </div>
+</body>
+</html>

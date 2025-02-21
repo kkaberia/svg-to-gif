@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Add Payment - Estate Portal</title>
+  <!-- Google Font for a modern look -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f4f4f9, #e0e0f5);
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    /* Form Container */
+    form {
+      background-color: #fff;
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin: 1.5rem;
+    }
+
+    /* Form Elements */
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 500;
+      color: #555;
+      font-size: 1rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    input[type="submit"] {
+      background-color: #3498db;
+      color: #fff;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      width: 100%;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+    }
+
+    /* Dynamic Field Styling */
+    #origin_bank_div {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    /* Multiple Select Styling */
+    #months {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: #fff;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      form {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+  
+  <h1>Add Payment on Behalf of User</h1>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Add Payment Form -->
+  <form action="{{ url_for('admin_add_payment') }}" method="post">
+    {{ form.hidden_tag() }}
+
+    <!-- User Selection Field -->
+    <label for="user_id">Select User:</label>
+    <select id="user_id" name="user_id" class="form-control" required>
+      <option value="">Select a user</option>
+      {% for user in users %}
+        <option value="{{ user.id }}">{{ user.username }} ({{ user.email }})</option>
+      {% endfor %}
+    </select>
+
+    <!-- Existing Fields -->
+    <label for="amount">{{ form.amount.label }}</label>
+    {{ form.amount(class="form-control") }}
+
+    <label for="payment_type">{{ form.payment_type.label }}</label>
+    {{ form.payment_type(class="form-control") }}
+
+    <div id="origin_bank_div">
+      <label for="origin_bank">Originating Bank:</label>
+      <input type="text" id="origin_bank" name="origin_bank" class="form-control">
+    </div>
+
+    <label for="payment_date">{{ form.payment_date.label }}</label>
+    {{ form.payment_date(class="form-control") }}
+
+    <label for="months">{{ form.months.label }}</label>
+    {{ form.months(class="form-control", multiple=True) }}
+
+    <input type="submit" value="Add Payment" class="btn btn-primary">
+  </form>
+
+  <script>
+    document.getElementById('payment_type').addEventListener('change', function() {
+      document.getElementById('origin_bank_div').style.display = this.value === 'Bank Transfer' ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>

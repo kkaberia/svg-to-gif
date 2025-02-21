@@ -1,0 +1,78 @@
+<nav>
+  <div class="nav-container">
+    <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+    {% if 'user_id' not in session %}
+      <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+    {% else %}
+      <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+      <a href="{{ url_for('fund_utilization_view') }}" class="nav-link">Funds Utilization</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-link">Admin Dashboard</a>
+      <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+    {% endif %}
+  </div>
+</nav>
+
+<style>
+  /* Navbar Styles */
+  nav {
+    background-color: #2c3e50;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 16px;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #3498db;
+  }
+
+  /* Active Link Styling */
+  .nav-link.active {
+    background-color: #3498db;
+    color: #fff;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .nav-container {
+      gap: 1rem;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      padding: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  // Add active class to the current page link
+  document.addEventListener('DOMContentLoaded', function () {
+    const currentUrl = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+      if (link.getAttribute('href') === currentUrl) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>

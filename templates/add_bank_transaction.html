@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add Bank Transaction</h1>
+
+<form method="POST" action="{{ url_for('add_bank_transaction') }}">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.date.label }}<br>
+        {{ form.date(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.description.label }}<br>
+        {{ form.description(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.amount.label }}<br>
+        {{ form.amount(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.payment_method.label }}<br>
+        {{ form.payment_method(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.payee.label }}<br>
+        {{ form.payee(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+{% endblock %}

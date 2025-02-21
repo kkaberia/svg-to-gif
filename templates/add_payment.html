@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Payment - Estate Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #f4f4f9, #e0e0f5);
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    form {
+      background-color: #fff;
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 500;
+      color: #555;
+      font-size: 1rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    input[type="submit"] {
+      background-color: #3498db;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #2980b9;
+    }
+
+    #origin_bank_div {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .btn-primary {
+      background-color: #3498db;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+  
+  <h1>Add a New Payment</h1>
+  <form action="{{ url_for('add_payment') }}" method="post">
+    {{ form.hidden_tag() }}
+    
+    <label for="amount">{{ form.amount.label }}</label>
+    {{ form.amount(class="form-control") }}
+    
+    <label for="payment_type">{{ form.payment_type.label }}</label>
+    {{ form.payment_type(class="form-control") }}
+    
+    <div id="origin_bank_div">
+      <label for="origin_bank">Originating Bank:</label>
+      <input type="text" id="origin_bank" name="origin_bank" class="form-control">
+    </div>
+    
+    <label for="payment_date">{{ form.payment_date.label }}</label>
+    {{ form.payment_date(class="form-control") }}
+    
+    <label for="months">{{ form.months.label }}</label>
+    {{ form.months(class="form-control", multiple=True) }}
+
+    {{ form.submit(class="btn btn-primary") }}
+  </form>
+  
+  <script>
+    document.getElementById('payment_type').addEventListener('change', function() {
+      document.getElementById('origin_bank_div').style.display = this.value === 'Bank Transfer' ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>

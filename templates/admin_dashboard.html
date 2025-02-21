@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Estate Portal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #3498db;
+        }
+
+        /* Container */
+        .container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 2rem;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* Financial Summary */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-item {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .summary-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-item strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        .summary-item span {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container, .table-container {
+            flex: 1;
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chart-container:hover, .table-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.875rem; /* Smaller font size for tables */
+        }
+
+        th, td {
+            padding: 0.5rem; /* Reduced padding for a compact look */
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        td {
+            color: #555;
+        }
+
+        /* Buttons and Links */
+        .add-payment-link, .add-user-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+        }
+
+        .add-payment-link:hover, .add-user-link:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .no-data {
+            text-align: center;
+            color: #777;
+            margin: 2rem 0;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-buttons a {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            background-color: #3498db;
+            color: #fff;
+            font-size: 0.875rem;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .action-buttons a:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-content {
+                flex-direction: column;
+            }
+
+            .summary {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        {% if 'user_id' not in session %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}">My Dashboard</a>
+            <a href="{{ url_for('admin_add_payment') }}">Add New Payment</a>
+            <a href="{{ url_for('fund_utilization_view') }}"> Funds Utilization</a> |
+            <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+    </nav>
+
+    <div class="container">
+        <!-- Financial Summary -->
+        <h3>Financial Summary</h3>
+        <div class="summary">
+            <!-- First Line -->
+            <div class="summary-item">
+                <strong>Opening Bank Balance</strong>
+                <span>KSHS {{ opening_bank_balance }}</span>
+            </div>
+            <div class="summary-item">
+                <strong>Total Received</strong>
+                <span>KSHS {{ total_received }}</span>
+            </div>
+            <div class="summary-item">
+                <strong>Arrears</strong>
+                <span style="color: red;">KSHS {{ arrears }}</span>
+            </div>
+            <div class="summary-item">
+                <strong>Not Due</strong>
+                <span>KSHS {{ not_due }}</span>
+            </div>
+
+            <!-- Second Line -->
+            <div class="summary-item" style="grid-column: span 2;">
+                <strong>Expenses Paid Out</strong>
+                <span style="color: red;">KSHS {{ total_debits }}</span>
+                                </div>
+
+            <!-- Third Line -->
+            <div class="summary-item" style="grid-column: span 2;">
+                <strong>Closing Bank Balance</strong>
+                <span>KSHS {{ closing_bank_balance }}</span>
+            </div>
+        </div>
+
+        <!-- Chart and Payment Records -->
+        <div class="dashboard-content">
+            <div class="chart-container">
+                <canvas id="financeChart" width="400" height="400"></canvas>
+            </div>
+
+            <div class="table-container">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Payment Records</h3>
+                    <a href="{{ url_for('admin_add_payment') }}" class="add-payment-link">Add Payment on Behalf of User</a>
+                </div>
+                {% if payments %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Date</th>
+                                <th>User ID</th>
+                                <th>Username</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Origin Bank</th>
+                                <th>Months</th>
+                                <th>Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                            <tr>
+                                <td>{{ payment.id }}</td>
+                                <td>{{ payment.date.strftime("%Y-%m-%d") }}</td>
+                                <td>{{ payment.user_id }}</td>
+                                <td>{{ payment.user.username }}</td>
+                                <td>{{ payment.amount }}</td>
+                                <td>{{ payment.payment_type }}</td>
+                                <td>{{ payment.origin_bank if payment.origin_bank else '' }}</td>
+                                <td>{{ payment.months if payment.months else '' }}</td>
+                                <td><a href="{{ url_for('update_payment', payment_id=payment.id) }}">Edit</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">No payment records found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- User Payments Overview -->
+        <h3>User Payments Overview</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Total Paid (KSHS)</th>
+                        <th>Arrears (KSHS)</th>
+                        <th>Pending Amount (KSHS)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_financial in user_financials %}
+                    <tr>
+                        <td>{{ user_financial.username }}</td>
+                        <td>{{ user_financial.total_paid }}</td>
+                        <td>{{ user_financial.arrears }}</td>
+                        <td>{{ user_financial.pending }}</td>
+                        <td class="action-buttons">
+                            <a href="{{ url_for('send_reminder', user_id=user_financial.user_id) }}">Send Reminder</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- User Management -->
+        <h3>User Management</h3>
+        <div class="table-container">
+            {% if users %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>House No.</th>
+                            <th>Family Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.last_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.house_number }}</td>
+                            <td>{{ user.family_name }}</td>
+                            <td class="action-buttons">
+                                <a href="{{ url_for('edit_user', user_id=user.id) }}">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-data">No users found.</p>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('add_user') }}" class="add-user-link">Add User</a>
+    </div>
+
+    <!-- Chart Script -->
+    <script>
+        const totalReceived = {{ total_received }};
+        const arrears = {{ arrears }};
+        const notDue = {{ not_due }};
+        const ctx = document.getElementById('financeChart').getContext('2d');
+        const financeChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Total Received', 'Arrears', 'Not Due'],
+                datasets: [{
+                    data: [totalReceived, arrears, notDue],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(255, 206, 86, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Financial Breakdown',
+                        font: {
+                            size: 18
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
