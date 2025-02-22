@@ -895,5 +895,4 @@ if __name__ == '__main__':
             )
             db.session.add(admin_user)
             db.session.commit()
-    with app.app_context():
-        db.create_all()
+    app.run(host='0.0.0.0', port=10000, debug=True)
