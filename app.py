@@ -32,6 +32,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from itsdangerous import URLSafeTimedSerializer
 from flask import jsonify
 from flask import Flask, render_template
+import logging
 
 
 app = Flask(__name__)
@@ -204,10 +205,12 @@ def admin_required(f):
 # ---------------------------
 # Routes
 # ---------------------------
+logging.basicConfig(level=logging.DEBUG)
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+     app.logger.debug('Rendering index.html')
+     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
