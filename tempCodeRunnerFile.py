@@ -1,1 +1,1 @@
-logging.basicConfig(level=logging.DEBUG)
+sqlite:///estate.db
