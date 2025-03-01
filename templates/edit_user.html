@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit User - Estate Portal</title>
-  <!-- Google Font -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome for Icons -->
+  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
     /* Global Styles */
@@ -17,81 +17,106 @@
       background-color: #f8f9fa;
       color: #333;
       line-height: 1.6;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+    }
+
+    /* Navigation Bar */
+    nav {
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    nav a {
+      color: #ecf0f1;
+      text-decoration: none;
+      margin: 0 1rem;
+      font-weight: 500;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #3498db;
+    }
+
+    /* Container */
+    .container {
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
     }
 
     h1 {
       font-size: 2.5rem;
-      font-weight: 700;
       color: #2c3e50;
       margin-bottom: 1.5rem;
       text-align: center;
+      font-weight: 700;
     }
 
-    /* Form Container */
-    form {
-      background-color: #fff;
-      padding: 2rem;
-      max-width: 500px;
-      width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin: 1.5rem;
+    /* Form Grid Layout */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
     }
 
     label {
-      display: block;
-      margin-top: 1rem;
       font-weight: 500;
+      margin-bottom: 0.5rem;
       color: #555;
-      font-size: 1rem;
     }
 
     input[type="text"],
-    input[type="email"] {
+    input[type="email"],
+    input[type="number"] {
       width: 100%;
       padding: 0.75rem;
-      margin-top: 0.5rem;
       border: 1px solid #ddd;
       border-radius: 8px;
-      box-sizing: border-box;
       font-size: 1rem;
+      box-sizing: border-box;
       transition: border-color 0.3s ease;
     }
 
     input[type="text"]:focus,
-    input[type="email"]:focus {
+    input[type="email"]:focus,
+    input[type="number"]:focus {
       border-color: #3498db;
       outline: none;
     }
 
-    input[type="submit"] {
+    input[readonly] {
+      background-color: #f9f9f9;
+      cursor: not-allowed;
+    }
+
+    /* Submit Button */
+    .submit-button {
       background-color: #3498db;
       color: #fff;
       padding: 0.75rem;
       border: none;
       border-radius: 8px;
-      cursor: pointer;
-      margin-top: 1.5rem;
       font-size: 1rem;
       font-weight: 500;
+      cursor: pointer;
       transition: background-color 0.3s ease, transform 0.3s ease;
       width: 100%;
+      max-width: 200px;
+      margin: 0 auto;
     }
 
-    input[type="submit"]:hover {
+    .submit-button:hover {
       background-color: #2980b9;
       transform: translateY(-2px);
-    }
-
-    /* Read-only Input Styling */
-    input[readonly] {
-      background-color: #f9f9f9;
-      cursor: not-allowed;
     }
 
     /* Responsive Design */
@@ -100,34 +125,84 @@
         font-size: 2rem;
       }
 
-      form {
-        padding: 1.5rem;
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .submit-button {
+        max-width: 100%;
       }
     }
   </style>
 </head>
 <body>
-  <h1>Edit User</h1>
-  <form action="{{ url_for('edit_user', user_id=user.id) }}" method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
-    
-    <label for="first_name">First Name:</label>
-    <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
-    
-    <label for="last_name">Last Name:</label>
-    <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
-    
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" value="{{ user.email }}" required>
-    
-    <label for="house_number">House Number:</label>
-    <input type="text" id="house_number" name="house_number" value="{{ user.house_number }}" required>
-    
-    <label for="family_name">Family Name:</label>
-    <input type="text" id="family_name" name="family_name" value="{{ user.family_name }}" required>
-    
-    <input type="submit" value="Update User">
-  </form>
+  <!-- Navigation Bar -->
+  <nav>
+    <a href="{{ url_for('home') }}">Home</a>
+    {% if 'user_id' not in session %}
+      <a href="{{ url_for('login') }}">Login</a>
+    {% else %}
+      <a href="{{ url_for('dashboard') }}">My Dashboard</a>
+      <a href="{{ url_for('admin_add_payment') }}">Add New Payment</a>
+      <a href="{{ url_for('fund_utilization_view') }}">Funds Utilization</a>
+      <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    {% endif %}
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container">
+    <h1>Edit User</h1>
+
+    <!-- Edit User Form -->
+    <form action="{{ url_for('edit_user', user_id=user.id) }}" method="post">
+      <div class="form-grid">
+        <!-- Username -->
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
+        </div>
+
+        <!-- First Name -->
+        <div class="form-group">
+          <label for="first_name">First Name:</label>
+          <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+        </div>
+
+        <!-- Last Name -->
+        <div class="form-group">
+          <label for="last_name">Last Name:</label>
+          <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        </div>
+
+        <!-- Opening Balance -->
+        <div class="form-group">
+          <label for="opening_balance">Opening Balance:</label>
+          <input type="number" step="0.01" id="opening_balance" name="opening_balance" value="{{ user.opening_balance }}" required>
+        </div>
+
+        <!-- House Number -->
+        <div class="form-group">
+          <label for="house_number">House Number:</label>
+          <input type="text" id="house_number" name="house_number" value="{{ user.house_number }}" required>
+        </div>
+
+        <!-- Family Name -->
+        <div class="form-group">
+          <label for="family_name">Family Name:</label>
+          <input type="text" id="family_name" name="family_name" value="{{ user.family_name }}" required>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <input type="submit" value="Update User" class="submit-button">
+    </form>
+  </div>
 </body>
 </html>

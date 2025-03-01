@@ -244,6 +244,7 @@
 
     <a href="{{ url_for('fund_utilization_view') }}">Funds Utilization</a>
     <a href="{{ url_for('logout') }}">Logout</a>
+    <a href="{{ url_for('change_password') }}">Change Password</a>
   </nav>
 
   <!-- Main Content -->
@@ -254,7 +255,12 @@
     <!-- Summary Section -->
     <div class="summary">
       <div class="summary-item">
-        <strong>Total Paid</strong>
+        <strong>Opening Balance</strong>
+        <span>KSH {{ current_user.opening_balance | format_currency }}</span>
+        <i class="fas fa-exclamation-triangle" style="color: rgb(111, 3, 3);"></i>
+    </div>      
+      <div class="summary-item">
+        <strong>Total Paid in 2025</strong>
         <span>KSHS {{ total_paid | format_currency }}</span>
         <i class="fas fa-check-circle" style="color: green;"></i>
       </div>
