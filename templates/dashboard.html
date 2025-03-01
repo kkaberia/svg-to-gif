@@ -237,7 +237,7 @@
     <!-- Admin-Specific Menus -->
     {% if session.get('user_role') == 'admin' %}
       <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
-      <a href="{{ url_for('fund_utilization') }}">Fund Utilization</a>
+      <a href="{{ url_for('fund_utilization') }}">Add Expense</a>
       <a href="{{ url_for('admin_add_payment') }}">Admin Add Payment</a>
       <a href="{{ url_for('add_user') }}">Add User</a>
     {% endif %}
