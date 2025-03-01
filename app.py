@@ -82,6 +82,7 @@ class AddUserForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email(), Length(max=100)])
     house_number = StringField('House Number', validators=[DataRequired(), Length(max=20)])
     family_name = StringField('Family Name', validators=[DataRequired(), Length(max=50)])
+    opening_balance = DecimalField('Opening Balance', default=0.0)  # New field
     submit = SubmitField('Add User')
 
 # Define the PaymentForm class
@@ -136,6 +137,7 @@ class User(db.Model, UserMixin):
     house_number = db.Column(db.String(20), nullable=False)
     family_name = db.Column(db.String(50), nullable=False)
     balance = db.Column(db.Float, default=0.0)
+    opening_balance = db.Column(db.Float, default=0.0)  # New column for opening balance
     payments = db.relationship('Payment', backref='user')
 
     # Flask-Login required methods
@@ -337,20 +339,34 @@ def dashboard():
         return redirect(url_for('login'))
 
     user_id = session['user_id']
+    user = User.query.get(user_id)  # Fetch the user
     current_year = datetime.now().year
     payments = Payment.query.filter_by(user_id=user_id).filter(
         Payment.date.between(datetime(current_year, 1, 1), datetime(current_year, 12, 31))
     ).all()
 
+    # Calculate total paid (including positive opening balance)
     total_paid = sum(p.amount for p in payments)
+    if user.opening_balance > 0:
+        total_paid += user.opening_balance  # Add positive opening balance to total paid
+
+    # Monthly due and expected payments
     monthly_due = 3850
     current_month = datetime.now().month
     expected_so_far = current_month * monthly_due
-    paid_segment = (total_paid *1)
+
+    # Calculate arrears (including negative opening balance)
+    arrears = max(expected_so_far - total_paid, 0)
+    if user.opening_balance < 0:
+        arrears += abs(user.opening_balance)  # Add negative opening balance to arrears
+
+    # Calculate pending amount for the year
+    pending = max(46200 - total_paid, 0)
+
+    # Calculate segments for visualization
+    paid_segment = (total_paid * 1)
     arrears_segment = max(expected_so_far - total_paid, 0)
     not_due_segment = (12 - current_month) * monthly_due
-    pending = max(46200 - total_paid, 0)
-    arrears =max(expected_so_far-total_paid,0)
 
     return render_template('dashboard.html', 
                            payments=payments, 
@@ -359,10 +375,10 @@ def dashboard():
                            arrears=arrears,
                            paid_segment=paid_segment,
                            arrears_segment=arrears_segment,
-                           not_due_segment=not_due_segment)
+                           not_due_segment=not_due_segment,
+                           opening_balance=user.opening_balance)  # Pass opening balance to template
 
 @app.route('/add_payment', methods=['GET', 'POST'])
-
 def add_payment():
     form = PaymentForm()
     if form.validate_on_submit():
@@ -630,7 +646,7 @@ def admin_dashboard():
                            transactions=transactions,
                            users=users,
                            user_financials=user_financials,
-                           current_user=current_user)
+                           current_user=current_user)  # Pass current_user to the template
 
 @app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
@@ -643,6 +659,7 @@ def add_user():
         email = form.email.data
         house_number = form.house_number.data
         family_name = form.family_name.data
+        opening_balance = form.opening_balance.data  # Get opening balance
 
         if User.query.filter(or_(User.username == username, User.email == email)).first():
             flash('Username or email already exists.', 'error')
@@ -658,7 +675,8 @@ def add_user():
             email=email,
             password=hashed_password,
             house_number=house_number,
-            family_name=family_name
+            family_name=family_name,
+            opening_balance=opening_balance  # Set opening balance
         )
 
         try:
@@ -687,6 +705,7 @@ def edit_user(user_id):
         user.email = request.form.get('email')
         user.house_number = request.form.get('house_number')
         user.family_name = request.form.get('family_name')
+        user.opening_balance = float(request.form.get('opening_balance', 0.0))  # Update opening balance
         db.session.commit()
         flash('User updated successfully!', 'success')
         return redirect(url_for('admin_dashboard'))
@@ -945,8 +964,8 @@ def add_bank_transaction():
 def send_reminder(user_id):
     user = User.query.get(user_id)
     if user:
-        msg = Message('Monthly Payment Reminder', recipients=[user.email])
-        msg.body = f"Hello {user.first_name},\n\nThis is a reminder to pay your monthly security payment of Kshs 3,850 via M-PESA Paybill 522522, Account No 1298976472.\n\nThank you."
+        msg = Message('Monthly Security Payment Reminder', recipients=[user.email])
+        msg.body = f"Hello {user.first_name},\n\nThis is a polite reminder to pay your monthly security payment of Kshs 3,850 via M-PESA Paybill 522522, Account No 1298976472.\n\nThank you."
         mail.send(msg)
         flash('Reminder sent successfully!', 'success')
     else:
@@ -960,6 +979,34 @@ def logout():
     session.pop('user_role', None)  # Clear the user role from the session
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
+
+    
+@app.route('/change_password', methods=['GET', 'POST'])
+@login_required  # Ensure only logged-in users can access this route
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Verify the current password
+        if not check_password_hash(current_user.password, current_password):
+            flash('Current password is incorrect.', 'error')
+            return redirect(url_for('change_password'))
+
+        # Check if the new password and confirmation match
+        if new_password != confirm_password:
+            flash('New password and confirmation do not match.', 'error')
+            return redirect(url_for('change_password'))
+
+        # Update the user's password
+        current_user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
+        db.session.commit()
+
+        flash('Password updated successfully!', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('change_password.html')
 
 
 if __name__ == '__main__':
