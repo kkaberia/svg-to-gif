@@ -40,7 +40,8 @@ app = Flask(__name__)
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key_here')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///estate.db')
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///estate.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://estateportal_user:8JEKVkfA20xJ0r22d3TNyldmSfKsWpZ9@dpg-cutm5i8gph6c73b47gn0-a.oregon-postgres.render.com/estateportal'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
