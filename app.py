@@ -295,9 +295,12 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
+        username = request.form.get('username').lower()  # Convert input to lowercase
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
+        
+        # Convert database username to lowercase for case-insensitive comparison
+        user = User.query.filter(func.lower(User.username) == username).first()
+        
         if user and check_password_hash(user.password, password):
             login_user(user)  # Log in the user
             session['user_id'] = user.id
@@ -307,6 +310,7 @@ def login():
             flash('Invalid username or password.', 'error')
             return redirect(url_for('login'))
     return render_template('login.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
