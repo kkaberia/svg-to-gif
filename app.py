@@ -169,20 +169,98 @@ def generate_random_password(length=8):
     characters = string.ascii_letters + string.digits #+ string.punctuation
     return ''.join(secrets.choice(characters) for _ in range(length))
 
+
 def send_password_email(email, username, password):
-    msg = Message('Your Plateau Estate Portal Password', sender='no-reply@estateportal.com', recipients=[email])
-    msg.body = f'''
-    Hello {username},
+    msg = Message(
+        subject='Your Plateau Estate Portal Password',
+        sender='no-reply@estateportal.com',
+        recipients=[email]
+    )
+    
+    # HTML content for the email
+    msg.html = f"""
+    <html>
+        <head>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f9f9f9;
+                }}
+                .container {{
+                    max-width: 600px;
+                    margin: 20px auto;
+                    padding: 20px;
+                    border: 1px solid #ddd;
+                    border-radius: 10px;
+                    background-color: #fff;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                }}
+                h1 {{
+                    color: #2c3e50;
+                    font-size: 24px;
+                    margin-bottom: 20px;
+                    text-align: center;
+                }}
+                p {{
+                    margin: 10px 0;
+                    font-size: 16px;
+                }}
+                .details {{
+                    background-color: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 20px 0;
+                }}
+                .details p {{
+                    margin: 5px 0;
+                }}
+                .footer {{
+                    margin-top: 20px;
+                    font-size: 14px;
+                    color: #777;
+                    text-align: center;
+                }}
+                .button {{
+                    display: inline-block;
+                    margin: 20px 0;
+                    padding: 12px 24px;
+                    background-color: #3498db;
+                    color: #fff;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    font-size: 16px;
+                    text-align: center;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Welcome to Plateau Estate Portal</h1>
+                <p>Hello {username},</p>
+                <p>Your account has been created successfully. Here are your login details:</p>
+                
+                <div class="details">
+                    <p><strong>Username:</strong> {username}</p>
+                    <p><strong>Password:</strong> {password}</p>
+                </div>
 
-    Your account has been created successfully. Here are your login details:
-    Username: {username}
-    Password: {password}
+                <p>Please log in and change your password as soon as possible.</p>
+                <a href="https://your-portal-url.com/login" class="button">Log In Now</a>
 
-    Please log in and change your password as soon as possible.
-
-    Regards,
-    Plateau Estate Portal Team
-    '''
+                <div class="footer">
+                    <p>Best regards,</p>
+                    <p><strong>Plateau Estate Portal Team</strong></p>
+                </div>
+            </div>
+        </body>
+    </html>
+    """
+    
+    # Send the email
     mail.send(msg)
 
     # Monthly reminder function
