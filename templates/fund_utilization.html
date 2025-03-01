@@ -277,7 +277,7 @@
     <div class="summary">
       <div class="summary-item">
         <strong>Total Outgoing Payments</strong>
-        <span>KSH {{ total_debits }}</span>
+        <span>KSH {{ total_debits | format_currency }}</span>
       </div>
     </div>
 
@@ -332,7 +332,7 @@
         <tr>
           <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td>
           <td>{{ transaction.narration }}</td>
-          <td>KSH {{ transaction.amount }}</td>
+          <td>KSH {{ transaction.amount | format_currency }}</td>
           <td>{{ transaction.payment_mode }}</td>
           <td>{{ transaction.payee }}</td>
           <td>

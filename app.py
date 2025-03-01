@@ -33,6 +33,7 @@ from itsdangerous import URLSafeTimedSerializer
 from flask import jsonify
 from flask import Flask, render_template
 import logging
+import psycopg2
 
 
 app = Flask(__name__)
@@ -329,7 +330,7 @@ def add_payment():
 # Add this to your app.py
 @app.template_filter('format_currency')
 def format_currency(value):
-    return "{:,.0f}".format(value)
+    return "{:,.2f}".format(value)
 
 @app.route('/update_payment', methods=['GET', 'POST'])
 def update_payment():

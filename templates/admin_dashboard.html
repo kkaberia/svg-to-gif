@@ -243,31 +243,31 @@
             <!-- First Line -->
             <div class="summary-item">
                 <strong>Opening Bank Balance</strong>
-                <span>KSHS {{ opening_bank_balance }}</span>
+                <span>KSHS {{ opening_bank_balance | format_currency }}</span>
             </div>
             <div class="summary-item">
                 <strong>Total Received</strong>
-                <span>KSHS {{ total_received }}</span>
+                <span>KSHS {{ total_received | format_currency }}</span>
             </div>
             <div class="summary-item">
                 <strong>Arrears</strong>
-                <span style="color: red;">KSHS {{ arrears }}</span>
+                <span style="color: red;">KSHS {{ arrears | format_currency }}</span>
             </div>
             <div class="summary-item">
                 <strong>Not Due</strong>
-                <span>KSHS {{ not_due }}</span>
+                <span>KSHS {{ not_due | format_currency }}</span>
             </div>
 
             <!-- Second Line -->
             <div class="summary-item" style="grid-column: span 2;">
                 <strong>Expenses Paid Out</strong>
-                <span style="color: red;">KSHS {{ total_debits }}</span>
-                                </div>
+                <span style="color: red;">KSHS {{ total_debits | format_currency }}</span>
+            </div>
 
             <!-- Third Line -->
             <div class="summary-item" style="grid-column: span 2;">
                 <strong>Closing Bank Balance</strong>
-                <span>KSHS {{ closing_bank_balance }}</span>
+                <span>KSHS {{ closing_bank_balance | format_currency }}</span>
             </div>
         </div>
 
@@ -304,7 +304,7 @@
                                 <td>{{ payment.date.strftime("%Y-%m-%d") }}</td>
                                 <td>{{ payment.user_id }}</td>
                                 <td>{{ payment.user.username }}</td>
-                                <td>{{ payment.amount }}</td>
+                                <td>{{ payment.amount | format_currency }}</td>
                                 <td>{{ payment.payment_type }}</td>
                                 <td>{{ payment.origin_bank if payment.origin_bank else '' }}</td>
                                 <td>{{ payment.months if payment.months else '' }}</td>
@@ -336,9 +336,9 @@
                     {% for user_financial in user_financials %}
                     <tr>
                         <td>{{ user_financial.username }}</td>
-                        <td>{{ user_financial.total_paid }}</td>
-                        <td>{{ user_financial.arrears }}</td>
-                        <td>{{ user_financial.pending }}</td>
+                        <td>{{ user_financial.total_paid | format_currency }}</td>
+                        <td>{{ user_financial.arrears | format_currency }}</td>
+                        <td>{{ user_financial.pending | format_currency }}</td>
                         <td class="action-buttons">
                             <a href="{{ url_for('send_reminder', user_id=user_financial.user_id) }}">Send Reminder</a>
                         </td>

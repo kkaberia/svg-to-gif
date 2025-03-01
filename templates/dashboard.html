@@ -255,17 +255,17 @@
     <div class="summary">
       <div class="summary-item">
         <strong>Total Paid</strong>
-        <span>KSHS {{ total_paid }}</span>
+        <span>KSHS {{ total_paid | format_currency }}</span>
         <i class="fas fa-check-circle" style="color: green;"></i>
       </div>
       <div class="summary-item">
         <strong>Arrears</strong>
-        <span>KSHS {{ arrears }}</span>
+        <span>KSHS {{ arrears | format_currency }}</span>
         <i class="fas fa-exclamation-triangle" style="color: red;"></i>
       </div>
       <div class="summary-item">
         <strong>Annual Amount Remaining</strong>
-        <span>KSHS {{ pending }}</span>
+        <span>KSHS {{ pending | format_currency }}</span>
         <i class="fas fa-exclamation-triangle" style="color: orange;"></i>
       </div>
     </div>
@@ -294,7 +294,7 @@
             {% for payment in payments %}
               <tr>
                 <td>{{ payment.id }}</td>
-                <td>KSHS {{ payment.amount }}</td>
+                <td>KSHS {{ payment.amount | format_currency }}</td>
                 <td>{{ payment.date.strftime("%Y-%m-%d") }}</td>
                 <td>{{ payment.payment_type }}</td>
                 <td>{{ payment.origin_bank if payment.origin_bank else "N/A" }}</td>

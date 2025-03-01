@@ -1,1 +1,1 @@
-sqlite:///estate.db
+wdok rsnf zxar hyft

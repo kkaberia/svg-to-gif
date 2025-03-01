@@ -157,7 +157,7 @@
   <!-- Navigation Bar -->
   <nav>
     <a href="{{ url_for('home') }}">Home</a> |
-    <a href="{{ url_for('fund_utilization_view') }}"class="active"> Funds Utilization</a> |
+    <a href="{{ url_for('fund_utilization_view') }}" class="active">Funds Utilization</a> |
     <a href="{{ url_for('dashboard') }}">My Dashboard</a> |
     <a href="{{ url_for('logout') }}">Logout</a>
   </nav>
@@ -179,34 +179,34 @@
     <div class="summary">
       <div class="summary-item">
         <strong>Total Expenses Paid so far in the current year 2025</strong>
-        <span>KSH {{ total_debits }}</span>
+        <span>KSH {{ total_debits | format_currency }}</span>
       </div>
     </div>
 
     <!-- Bank Transactions Table -->
     <h2>Outgoing Payments Transactions</h2>
     <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Narration</th>
-            <th>Amount</th>
-            <th>Payment Mode</th>
-            <th>Payee</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for transaction in transactions %}
-          <tr>
-            <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ transaction.narration }}</td>
-            <td>KSH {{ transaction.amount }}</td>
-            <td>{{ transaction.payment_mode }}</td>
-            <td>{{ transaction.payee }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Narration</th>
+          <th>Amount</th>
+          <th>Payment Mode</th>
+          <th>Payee</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for transaction in transactions %}
+        <tr>
+          <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ transaction.narration }}</td>
+          <td>KSH {{ transaction.amount | format_currency }}</td>
+          <td>{{ transaction.payment_mode }}</td>
+          <td>{{ transaction.payee }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </body>
 </html>
