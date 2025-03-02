@@ -245,10 +245,8 @@
                 <strong>Opening Bank Balance</strong>
                 <span>KSHS {{ opening_bank_balance | format_currency }}</span>
             </div>
-            <div class="summary-item">
-                <strong>Opening Balance</strong>
-                <span>KSH {{ current_user.opening_balance | format_currency }}</span>
-            </div>
+            
+            
             <div class="summary-item">
                 <strong>Total Received</strong>
                 <span>KSHS {{ total_received | format_currency }}</span>
@@ -324,12 +322,13 @@
         </div>
 
         <!-- User Payments Overview -->
-        <h3>User Payments Overview</h3>
+        <h3>Members Payments Summary</h3>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
                         <th>Username</th>
+                        <th>Opening Balance</th>
                         <th>Total Paid (KSHS)</th>
                         <th>Arrears (KSHS)</th>
                         <th>Pending Amount (KSHS)</th>
@@ -340,6 +339,7 @@
                     {% for user_financial in user_financials %}
                     <tr>
                         <td>{{ user_financial.username }}</td>
+                        <td>{{ user_financial.opening_balance | format_currency }}</td>
                         <td>{{ user_financial.total_paid | format_currency }}</td>
                         <td>{{ user_financial.arrears | format_currency }}</td>
                         <td>{{ user_financial.pending | format_currency }}</td>
