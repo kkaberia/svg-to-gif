@@ -1,3 +1,4 @@
+from functools import wraps  # Add this import at the top of the file
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -625,6 +626,7 @@ def admin_dashboard():
         user_pending = max(46200 - user_payments, 0)
         user_financials.append({
             'username': usr.username,
+            'opening_balance': usr.opening_balance,  # Include opening balance
             'total_paid': user_payments,
             'arrears': user_arrears,
             'pending': user_pending,
