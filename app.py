@@ -253,7 +253,7 @@ def send_password_email(email, username, password):
                 </div>
 
                 <p>Please log in and change your password as soon as possible.</p>
-                <a href="https://your-portal-url.com/login" class="button">Log In Now</a>
+                <a href="https://estate-portal.onrender.com/login" class="button">Log In Now</a>
 
                 <div class="footer">
                     <p>Best regards,</p>
