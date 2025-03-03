@@ -76,7 +76,8 @@
 
     input[type="text"],
     input[type="email"],
-    input[type="number"] {
+    input[type="number"],
+    select {
       width: 100%;
       padding: 0.75rem;
       border: 1px solid #ddd;
@@ -88,7 +89,8 @@
 
     input[type="text"]:focus,
     input[type="email"]:focus,
-    input[type="number"]:focus {
+    input[type="number"]:focus,
+    select:focus {
       border-color: #3498db;
       outline: none;
     }
@@ -197,6 +199,15 @@
         <div class="form-group">
           <label for="family_name">Family Name:</label>
           <input type="text" id="family_name" name="family_name" value="{{ user.family_name }}" required>
+        </div>
+
+        <!-- Role -->
+        <div class="form-group">
+          <label for="role">Role:</label>
+          <select id="role" name="role" required>
+            <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="member" {% if user.role == 'member' %}selected{% endif %}>Member</option>
+          </select>
         </div>
       </div>
 

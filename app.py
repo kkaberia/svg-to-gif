@@ -708,6 +708,7 @@ def edit_user(user_id):
         user.house_number = request.form.get('house_number')
         user.family_name = request.form.get('family_name')
         user.opening_balance = float(request.form.get('opening_balance', 0.0))  # Update opening balance
+        user.role = request.form['role']  # Update the role
         db.session.commit()
         flash('User updated successfully!', 'success')
         return redirect(url_for('admin_dashboard'))
