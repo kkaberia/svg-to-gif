@@ -1,4 +1,10 @@
-const { parseArgs, loadConfig, mergeOptions, validateOptions, runConversion } = require("./core");
+const {
+  parseArgs,
+  loadConfig,
+  mergeOptions,
+  validateOptions,
+  runConversion,
+} = require("./core");
 
 async function main() {
   const started = Date.now();

@@ -1,6 +1,10 @@
 const path = require("path");
 
-function buildFfmpegArgs(framesDir, outputPath, { fps, width, height, format, scaleStrategy, crf }) {
+function buildFfmpegArgs(
+  framesDir,
+  outputPath,
+  { fps, width, height, format, scaleStrategy, crf },
+) {
   const inputPattern = path.join(framesDir, "frame_%04d.png");
 
   const isGif = format === "gif";
@@ -12,8 +16,12 @@ function buildFfmpegArgs(framesDir, outputPath, { fps, width, height, format, sc
   const shouldScale = hasWidth || hasHeight;
 
   let kernel = "lanczos";
-  if (scaleStrategy === "neighbor") {kernel = "neighbor";}
-  if (scaleStrategy === "bilinear") {kernel = "bilinear";}
+  if (scaleStrategy === "neighbor") {
+    kernel = "neighbor";
+  }
+  if (scaleStrategy === "bilinear") {
+    kernel = "bilinear";
+  }
 
   const filters = [];
   if (shouldScale) {
@@ -24,19 +32,10 @@ function buildFfmpegArgs(framesDir, outputPath, { fps, width, height, format, sc
 
   const vfArgs = filters.length > 0 ? ["-vf", filters.join(",")] : [];
 
-  const baseArgs = [
-    "-y",
-    "-framerate", String(fps),
-    "-i", inputPattern,
-  ];
+  const baseArgs = ["-y", "-framerate", String(fps), "-i", inputPattern];
 
   if (isGif) {
-    return [
-      ...baseArgs,
-      ...vfArgs,
-      "-loop", "0",
-      outputPath,
-    ];
+    return [...baseArgs, ...vfArgs, "-loop", "0", outputPath];
   }
 
   if (isWebm) {
@@ -44,10 +43,14 @@ function buildFfmpegArgs(framesDir, outputPath, { fps, width, height, format, sc
     return [
       ...baseArgs,
       ...vfArgs,
-      "-c:v", "libvpx-vp9",
-      "-b:v", "0",
-      "-crf", String(usedCrf),
-      "-pix_fmt", "yuva420p",
+      "-c:v",
+      "libvpx-vp9",
+      "-b:v",
+      "0",
+      "-crf",
+      String(usedCrf),
+      "-pix_fmt",
+      "yuva420p",
       outputPath,
     ];
   }
@@ -57,11 +60,16 @@ function buildFfmpegArgs(framesDir, outputPath, { fps, width, height, format, sc
     return [
       ...baseArgs,
       ...vfArgs,
-      "-c:v", "libx264",
-      "-crf", String(usedCrf),
-      "-preset", "slow",
-      "-pix_fmt", "yuv420p",
-      "-movflags", "+faststart",
+      "-c:v",
+      "libx264",
+      "-crf",
+      String(usedCrf),
+      "-preset",
+      "slow",
+      "-pix_fmt",
+      "yuv420p",
+      "-movflags",
+      "+faststart",
       outputPath,
     ];
   }

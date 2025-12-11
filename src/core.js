@@ -9,8 +9,8 @@ const presets = require("./presets");
 const DEFAULTS = {
   duration: 4,
   fps: 30,
-  width: 0,              // 0 => native
-  height: 0,             // 0 => auto from SVG aspect
+  width: 0, // 0 => native
+  height: 0, // 0 => auto from SVG aspect
   scheme: "light",
   format: "gif",
   maxFrames: 2000,
@@ -92,7 +92,9 @@ function parseArgs(argv) {
 
 function loadConfig(cwd) {
   const configPath = path.join(cwd, "svg-to-gif.config.json");
-  if (!fs.existsSync(configPath)) {return {};}
+  if (!fs.existsSync(configPath)) {
+    return {};
+  }
   try {
     const raw = fs.readFileSync(configPath, "utf8");
     return JSON.parse(raw);
@@ -177,7 +179,8 @@ function validateOptions(opts) {
   }
 
   const totalFrames = Math.round(duration * fps);
-  const max = typeof maxFrames === "number" && maxFrames > 0 ? maxFrames : DEFAULTS.maxFrames;
+  const max =
+    typeof maxFrames === "number" && maxFrames > 0 ? maxFrames : DEFAULTS.maxFrames;
   if (totalFrames > max) {
     throw new Error(`duration * fps yields ${totalFrames} frames; max is ${max}`);
   }
@@ -237,7 +240,9 @@ async function runConversion(params) {
 
   console.error("Input:", inputSvg);
   console.error("Output:", outputPath);
-  console.error(`Format: ${format}, Duration: ${duration}s, FPS: ${fps}, Frames: ${totalFrames}`);
+  console.error(
+    `Format: ${format}, Duration: ${duration}s, FPS: ${fps}, Frames: ${totalFrames}`,
+  );
   console.error(`Viewport width: ${width || "native"}, height: ${height || "auto"}`);
   console.error(`Color scheme: ${scheme}`);
   console.error(`Scale strategy: ${scaleStrategy}`);
@@ -302,7 +307,11 @@ ${svgMarkup}
       const framePath = path.join(framesDir, `frame_${String(i).padStart(4, "0")}.png`);
       await page.screenshot({ path: framePath });
 
-      if (i === 0 || i === totalFrames - 1 || i % Math.max(1, Math.floor(totalFrames / 10)) === 0) {
+      if (
+        i === 0 ||
+        i === totalFrames - 1 ||
+        i % Math.max(1, Math.floor(totalFrames / 10)) === 0
+      ) {
         const pct = Math.round(((i + 1) / totalFrames) * 100);
         console.error(`Frames: ${i + 1}/${totalFrames} (${pct}%)`);
       }
@@ -321,8 +330,12 @@ ${svgMarkup}
       const shouldScale = hasWidth || hasHeight;
 
       let kernel = "lanczos";
-      if (scaleStrategy === "neighbor") {kernel = "neighbor";}
-      if (scaleStrategy === "bilinear") {kernel = "bilinear";}
+      if (scaleStrategy === "neighbor") {
+        kernel = "neighbor";
+      }
+      if (scaleStrategy === "bilinear") {
+        kernel = "bilinear";
+      }
 
       const filters = [];
       if (shouldScale) {
@@ -333,11 +346,7 @@ ${svgMarkup}
 
       const scaleFilter = filters.join(",");
 
-      const paletteGenArgs = [
-        "-y",
-        "-framerate", String(fps),
-        "-i", inputPattern,
-      ];
+      const paletteGenArgs = ["-y", "-framerate", String(fps), "-i", inputPattern];
       if (scaleFilter) {
         paletteGenArgs.push("-vf", `${scaleFilter},palettegen`);
       } else {
@@ -350,9 +359,12 @@ ${svgMarkup}
 
       const paletteUseArgs = [
         "-y",
-        "-framerate", String(fps),
-        "-i", inputPattern,
-        "-i", palettePath,
+        "-framerate",
+        String(fps),
+        "-i",
+        inputPattern,
+        "-i",
+        palettePath,
       ];
       if (scaleFilter) {
         paletteUseArgs.push("-lavfi", `${scaleFilter},paletteuse`);

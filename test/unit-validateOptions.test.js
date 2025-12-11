@@ -14,7 +14,7 @@ test("validateOptions rejects invalid fps", () => {
       scaleStrategy: "lanczos",
       palette: false,
       crf: null,
-    })
+    }),
   ).toThrow();
 });
 
@@ -44,6 +44,6 @@ test("validateOptions falls back to DEFAULTS.maxFrames", () => {
       duration: 51, // within allowed range but exceeds default frame cap when combined with fps
       fps: 40,
       maxFrames: undefined,
-    })
+    }),
   ).toThrow(`max is ${DEFAULTS.maxFrames}`);
 });

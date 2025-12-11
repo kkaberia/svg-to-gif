@@ -5,15 +5,15 @@ module.exports = {
     scaleStrategy: "neighbor",
     palette: true,
     format: "gif",
-    crf: null
+    crf: null,
   },
-  "smooth": {
+  smooth: {
     description: "Fluid particle motion / animations.",
     fps: 24,
     scaleStrategy: "bilinear",
     palette: true,
     format: "gif",
-    crf: null
+    crf: null,
   },
   "pixel-art": {
     description: "Pixel art or blocky animations with sharp boundaries.",
@@ -21,7 +21,7 @@ module.exports = {
     scaleStrategy: "neighbor",
     palette: true,
     format: "gif",
-    crf: null
+    crf: null,
   },
   "hd-video": {
     description: "High-quality video output (MP4).",
@@ -29,6 +29,6 @@ module.exports = {
     scaleStrategy: "lanczos",
     palette: false,
     format: "mp4",
-    crf: 18
-  }
+    crf: 18,
+  },
 };

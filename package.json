@@ -3,6 +3,7 @@
   "version": "0.3.0",
   "description": "Headless SVG to GIF/WebM/MP4 converter using Puppeteer + ffmpeg, with presets",
   "author": "Really Him",
+  "license": "MIT",
   "type": "commonjs",
   "main": "src/core.js",
   "bin": {

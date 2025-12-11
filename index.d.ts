@@ -38,12 +38,14 @@ export function loadConfig(cwd: string): Partial<SvgToGifOptions>;
 
 export function mergeOptions(
   config: Partial<SvgToGifOptions>,
-  cliOptions: SvgToGifOptions
+  cliOptions: SvgToGifOptions,
 ): SvgToGifOptions & { maxFrames: number; useGifsicle: boolean };
 
 export function validateOptions(opts: SvgToGifOptions): ValidatedOptions;
 
-export function runConversion(params: {
-  inputSvg: string;
-  outputPath: string;
-} & ValidatedOptions): Promise<void>;
+export function runConversion(
+  params: {
+    inputSvg: string;
+    outputPath: string;
+  } & ValidatedOptions,
+): Promise<void>;

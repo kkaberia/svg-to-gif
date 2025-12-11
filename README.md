@@ -55,7 +55,7 @@ Config file (optional, values overridden by CLI flags):
   "scaleStrategy": "neighbor",
   "palette": true,
   "maxFrames": 2000,
-  "useGifsicle": true
+  "useGifsicle": true,
 }
 ```
 
