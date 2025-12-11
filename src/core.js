@@ -297,7 +297,7 @@ ${svgMarkup}
         }
       }, t);
 
-      const framePath = path.join(framesDir, `frame_${String(i).padStart(4, "0")}.png");
+      const framePath = path.join(framesDir, `frame_${String(i).padStart(4, "0")}.png`);
       await page.screenshot({ path: framePath });
 
       if (i === 0 || i === totalFrames - 1 || i % Math.max(1, Math.floor(totalFrames / 10)) === 0) {
