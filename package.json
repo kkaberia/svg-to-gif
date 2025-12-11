@@ -1,7 +1,8 @@
 {
   "name": "svg-to-gif",
   "version": "0.3.0",
-  "description": "Headless SVG \u2192 GIF/WebM/MP4 converter using Puppeteer + ffmpeg, with presets.",
+  "description": "Headless SVG \u2192 GIF/WebM/MP4 converter using Puppeteer + ffmpeg, with presets",
+  "author": "Really Him",
   "type": "commonjs",
   "main": "src/core.js",
   "bin": {
@@ -9,6 +10,7 @@
   },
   "scripts": {
     "test": "jest",
+    "test:integration": "SVG_TO_GIF_RUN_INTEGRATION=1 jest",
     "lint": "echo \"no lint configured\"",
     "build": "echo \"no build step\""
   },
