@@ -16,6 +16,7 @@ npm run clean
 npm ci
 npm run lint
 npm test
+npm run test:coverage
 ```
 
 ### Running integration tests in a CI-like environment

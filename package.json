@@ -27,6 +27,7 @@
   "scripts": {
     "test": "jest",
     "test:integration": "SVG_TO_GIF_RUN_INTEGRATION=1 jest",
+    "test:coverage": "jest --coverage",
     "clean": "rm -rf node_modules dist coverage .turbo .cache",
     "lint": "eslint .",
     "format": "prettier --check .",
