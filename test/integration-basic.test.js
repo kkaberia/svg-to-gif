@@ -4,18 +4,16 @@ const { execFileSync } = require("child_process");
 const { runConversion } = require("../src/core");
 
 const RUN_INTEGRATION = process.env.SVG_TO_GIF_RUN_INTEGRATION === "1";
+const outDir = path.join(__dirname, "out");
+fs.mkdirSync(outDir, { recursive: true });
 
-const outputs = [];
-
-afterAll(() => {
-  for (const file of outputs) {
-    try {
-      fs.rmSync(file, { force: true });
-    } catch {
-      // ignore cleanup failures in tests
-    }
+function prepOutput(name) {
+  const target = path.join(outDir, name);
+  if (fs.existsSync(target)) {
+    fs.rmSync(target);
   }
-});
+  return target;
+}
 
 function probeFormat(filePath) {
   const raw = execFileSync(
@@ -37,8 +35,7 @@ function probeFormat(filePath) {
 
 (RUN_INTEGRATION ? test : test.skip)("converts static SVG to GIF", async () => {
   const input = path.join(__dirname, "fixtures", "static.svg");
-  const out = path.join(__dirname, "out-static.gif");
-  outputs.push(out);
+  const out = prepOutput("out-static.gif");
 
   await runConversion({
     inputSvg: input,
@@ -63,8 +60,7 @@ function probeFormat(filePath) {
 
 (RUN_INTEGRATION ? test : test.skip)("converts static SVG to MP4", async () => {
   const input = path.join(__dirname, "fixtures", "static.svg");
-  const out = path.join(__dirname, "out-static.mp4");
-  outputs.push(out);
+  const out = prepOutput("out-static.mp4");
 
   await runConversion({
     inputSvg: input,
@@ -94,8 +90,7 @@ function probeFormat(filePath) {
 
 (RUN_INTEGRATION ? test : test.skip)("converts static SVG to WebM", async () => {
   const input = path.join(__dirname, "fixtures", "static.svg");
-  const out = path.join(__dirname, "out-static.webm");
-  outputs.push(out);
+  const out = prepOutput("out-static.webm");
 
   await runConversion({
     inputSvg: input,
