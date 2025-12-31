@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"name": "estate_portal",
+			"path": "."
+		}
+	],
+	"settings": {
+		"appService.defaultWebAppToDeploy": "undefined/subscriptions/08806374-de9a-44b8-8b6e-cf0102b73026/resourceGroups/appsvc_linux_centralus_basic/providers/Microsoft.Web/sites/Plateaucluster",
+		"appService.deploySubpath": "."
+	}
+}
