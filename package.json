@@ -1,0 +1,54 @@
+{
+  "name": "svg-to-gif",
+  "version": "1.1.0",
+  "description": "Headless SVG to GIF/WebM/MP4 converter using Puppeteer + ffmpeg, with presets",
+  "author": "Really Him",
+  "license": "MIT",
+  "type": "commonjs",
+  "main": "src/core.js",
+  "bin": {
+    "svg-to-gif": "./bin/svg-to-gif"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "svg",
+    "gif",
+    "puppeteer",
+    "ffmpeg",
+    "animation",
+    "cli"
+  ],
+  "scripts": {
+    "test": "jest",
+    "test:integration": "SVG_TO_GIF_RUN_INTEGRATION=1 jest",
+    "test:coverage": "jest --coverage",
+    "clean": "rm -rf node_modules dist coverage .turbo .cache",
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "prepublishOnly": "npm run clean && npm ci && npm run lint && npm run test"
+  },
+  "dependencies": {
+    "puppeteer": "^24.33.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "image-size": "^2.0.2",
+    "jest": "^30.2.0",
+    "prettier": "^3.7.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
