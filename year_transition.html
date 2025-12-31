@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Year Transition</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <strong>Warning:</strong> This action will transition the system to a new year.
+                        <ul class="mb-0 mt-2">
+                            <li>Closing balances for {{ datetime.now().year }} will be calculated</li>
+                            <li>Opening balances for {{ datetime.now().year + 1 }} will be set based on closing balances</li>
+                            <li>This action cannot be undone!</li>
+                        </ul>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('year_transition') }}">
+                        <div class="form-group">
+                            <label for="new_year">New Year:</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="new_year" 
+                                   name="new_year" 
+                                   value="{{ datetime.now().year + 1 }}" 
+                                   min="{{ datetime.now().year + 1 }}" 
+                                   required>
+                            <small class="form-text text-muted">
+                                Enter the year you want to transition to (must be greater than current year)
+                            </small>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <a href="{{ url_for('calculate_closing_balances', year=datetime.now().year) }}" 
+                               class="btn btn-info">
+                                Preview Closing Balances
+                            </a>
+                            <button type="submit" class="btn btn-primary float-right">
+                                Transition to New Year
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
