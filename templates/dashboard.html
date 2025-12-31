@@ -231,20 +231,7 @@
 <body>
   <!-- Navigation Bar -->
   <nav>
-        <a href="{{ url_for('dashboard') }}" class="active">My Dashboard</a>
-
-    <!-- Admin-Specific Menus -->
-    {% if session.get('user_role') == 'admin' %}
-      <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
-      <a href="{{ url_for('fund_utilization') }}">Add Expense</a>
-      <a href="{{ url_for('admin_add_payment') }}">Admin Add Payment</a>
-      <a href="{{ url_for('add_user') }}">Add User</a>
-    {% endif %}
-
-    <a href="{{ url_for('add_payment') }}">Add Payment</a>
-    <a href="{{ url_for('fund_utilization_view') }}">Funds Utilization</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
-    <a href="{{ url_for('change_password') }}">Change Password</a>
+    {% include 'navbar.html' %}
   </nav>
 
   <!-- Main Content -->
@@ -258,9 +245,9 @@
         <strong>Opening Balance</strong>
         <span>KSH {{ current_user.opening_balance | format_currency }}</span>
         <i class="fas fa-exclamation-triangle" style="color: rgb(111, 3, 3);"></i>
-    </div>      
+      </div>      
       <div class="summary-item">
-        <strong>Total Paid in 2025</strong>
+        <strong>Total Paid in {{ selected_year }}</strong>
         <span>KSHS {{ total_paid | format_currency }}</span>
         <i class="fas fa-check-circle" style="color: green;"></i>
       </div>
@@ -282,7 +269,7 @@
     </div>
 
     <!-- Payment History -->
-    <h2>Payment History</h2>
+    <h2>Payment History for {{ selected_year }}</h2>
     <div class="payment-history">
       {% if payments %}
         <table>
@@ -294,6 +281,7 @@
               <th>Method</th>
               <th>Origin Bank</th>
               <th>Months</th>
+              <th>Year</th>
             </tr>
           </thead>
           <tbody>
@@ -305,12 +293,13 @@
                 <td>{{ payment.payment_type }}</td>
                 <td>{{ payment.origin_bank if payment.origin_bank else "N/A" }}</td>
                 <td>{{ payment.months if payment.months else "N/A" }}</td>
+                <td>{{ payment.year if payment.year else selected_year }}</td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
       {% else %}
-        <p>No payments found.</p>
+        <p>No payments found for {{ selected_year }}.</p>
       {% endif %}
     </div>
 
@@ -358,7 +347,7 @@
           },
           title: {
             display: true,
-            text: 'Payment Summary',
+            text: 'Payment Summary for {{ selected_year }}',
             font: {
               size: 18
             }
