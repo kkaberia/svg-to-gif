@@ -174,6 +174,14 @@ class Payment(db.Model):
    # user = db.relationship('User', backref=db.backref('payments', lazy=True)) 
 
 # ===== EMERGENCY DATABASE FIX =====
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != 'admin':
+            flash('You do not have permission to access this page.', 'error')
+            return redirect(url_for('home'))  # Redirect to home or login page
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.before_request
 def ensure_database_schema():
@@ -642,15 +650,6 @@ def send_monthly_reminders():
             msg.body = f"Hello {user.first_name},\n\nThis is a reminder to pay your monthly security fee via M-PESA Paybill 522522 Account No 7102430033.\n\nThank you,\nPlateau Estate Management."
             mail.send(msg)
 
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role != 'admin':
-            flash('You do not have permission to access this page.', 'error')
-            return redirect(url_for('home'))  # Redirect to home or login page
-        return f(*args, **kwargs)
-    return decorated_function
 
 # ---------------------------
 # Routes
