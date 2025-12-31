@@ -174,10 +174,10 @@ class Payment(db.Model):
    # user = db.relationship('User', backref=db.backref('payments', lazy=True)) 
 
 # ===== EMERGENCY DATABASE FIX =====
-@app.before_first_request
+
+@app.before_request
 def ensure_database_schema():
-    """Ensure all required database columns exist"""
-    try:
+    if not hasattr(app, 'schema_checked'):
         from sqlalchemy import inspect, text
         
         inspector = inspect(db.engine)
@@ -199,10 +199,8 @@ def ensure_database_schema():
                 print("✅ Updated existing payments with year values")
             else:
                 print("✅ Year column already exists")
-                
-    except Exception as e:
-        print(f"⚠️ Schema check error: {e}")
-        db.session.rollback()
+        
+        app.schema_checked = True
 
 # ===== TEMPORARY FIX ROUTE =====
 @app.route('/fix_year_column')
