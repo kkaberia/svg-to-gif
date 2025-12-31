@@ -172,7 +172,7 @@ class Payment(db.Model):
    # Define the relationship to the User model
    # user = db.relationship('User', backref=db.backref('payments', lazy=True)) 
 
-   # ===== EMERGENCY DATABASE FIX =====
+# ===== EMERGENCY DATABASE FIX =====
 @app.before_first_request
 def ensure_database_schema():
     """Ensure all required database columns exist"""
