@@ -167,9 +167,69 @@ class Payment(db.Model):
     payment_type = db.Column(db.String(50))
     origin_bank = db.Column(db.String(50), nullable=True)
     months = db.Column(db.String(100), nullable=True)
+    year = db.Column(db.Integer, default=lambda: datetime.now().year)  # ADD THIS LINE
 
    # Define the relationship to the User model
    # user = db.relationship('User', backref=db.backref('payments', lazy=True)) 
+
+   # ===== EMERGENCY DATABASE FIX =====
+@app.before_first_request
+def ensure_database_schema():
+    """Ensure all required database columns exist"""
+    try:
+        from sqlalchemy import inspect, text
+        
+        inspector = inspect(db.engine)
+        
+        # Check if payment table exists
+        if 'payment' in inspector.get_table_names():
+            # Check columns
+            columns = [col['name'] for col in inspector.get_columns('payment')]
+            
+            # Add year column if missing
+            if 'year' not in columns:
+                db.session.execute(text("ALTER TABLE payment ADD COLUMN IF NOT EXISTS year INTEGER"))
+                db.session.commit()
+                print("✅ Added year column to payment table")
+                
+                # Set default values for existing payments
+                db.session.execute(text("UPDATE payment SET year = EXTRACT(YEAR FROM date) WHERE year IS NULL"))
+                db.session.commit()
+                print("✅ Updated existing payments with year values")
+            else:
+                print("✅ Year column already exists")
+                
+    except Exception as e:
+        print(f"⚠️ Schema check error: {e}")
+        db.session.rollback()
+
+# ===== TEMPORARY FIX ROUTE =====
+@app.route('/fix_year_column')
+@admin_required
+def fix_year_column():
+    """One-time fix for year column"""
+    try:
+        from sqlalchemy import text
+        
+        # Add column
+        db.session.execute(text("ALTER TABLE payment ADD COLUMN IF NOT EXISTS year INTEGER"))
+        
+        # Update existing payments
+        db.session.execute(text("UPDATE payment SET year = EXTRACT(YEAR FROM date) WHERE year IS NULL"))
+        
+        db.session.commit()
+        
+        # Count updated
+        result = db.session.execute(text("SELECT COUNT(*) FROM payment WHERE year IS NOT NULL"))
+        count = result.fetchone()[0]
+        
+        flash(f'Year column fixed! {count} payments updated.', 'success')
+        return redirect(url_for('admin_dashboard'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('admin_dashboard'))
 # ---------------------------
 # Utility Functions
 # ---------------------------
@@ -1716,18 +1776,31 @@ def user_payment_summary(user_id):
 @admin_required
 def update_existing_payments_years():
     """Temporary route to update existing payments with year from date"""
-    payments = Payment.query.all()
-    updated_count = 0
-    
-    for payment in payments:
-        if payment.year is None:
-            payment.year = payment.date.year
-            updated_count += 1
-    
-    db.session.commit()
-    
-    flash(f'Updated {updated_count} payments with year information', 'success')
-    return redirect(url_for('admin_dashboard'))
+    try:
+        # First ensure year column exists
+        from sqlalchemy import text
+        db.session.execute(text("ALTER TABLE payment ADD COLUMN IF NOT EXISTS year INTEGER"))
+        db.session.commit()
+        
+        # Now update payments
+        payments = Payment.query.all()
+        updated_count = 0
+        
+        for payment in payments:
+            # Safely check if year attribute exists
+            current_year = getattr(payment, 'year', None)
+            if current_year is None or current_year == 0:
+                payment.year = payment.date.year
+                updated_count += 1
+        
+        db.session.commit()
+        
+        flash(f'Updated {updated_count} payments with year information', 'success')
+        return redirect(url_for('admin_dashboard'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating payments: {str(e)}', 'error')
+        return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/send_statement_email/<int:user_id>', methods=['POST'])
