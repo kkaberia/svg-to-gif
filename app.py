@@ -1,4 +1,5 @@
 from functools import wraps  # Add this import at the top of the file
+from flask_login import login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -205,6 +206,7 @@ def ensure_database_schema():
 
 # ===== TEMPORARY FIX ROUTE =====
 @app.route('/fix_year_column')
+@login_required      # ADD THIS LINE
 @admin_required
 def fix_year_column():
     """One-time fix for year column"""
