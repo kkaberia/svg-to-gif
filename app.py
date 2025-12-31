@@ -757,6 +757,19 @@ def dashboard():
                            opening_balance=user.opening_balance,
                            selected_year=selected_year)
 
+@app.route('/year_transition')
+@login_required
+def year_transition():
+    """Handle year selection for viewing different years"""
+    if request.args.get('year'):
+        year = int(request.args.get('year'))
+        session['selected_year'] = year
+        flash(f'Now viewing payments for {year}', 'info')
+    
+    # Redirect back to where they came from
+    referrer = request.referrer or url_for('dashboard')
+    return redirect(referrer)                           
+
 @app.route('/add_payment', methods=['GET', 'POST'])
 def add_payment():
     form = PaymentForm()
