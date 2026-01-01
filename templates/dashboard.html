@@ -307,7 +307,7 @@
     <div class="year-selector">
       <h3>Select Year to View</h3>
       <div class="year-buttons">
-        {% for year in [2023, 2024, 2025, 2026] %}
+        {% for year in [2025, 2026] %}
           <a href="{{ url_for('year_transition', year=year) }}" 
              class="year-btn {{ 'active' if selected_year == year else 'inactive' }}">
             {{ year }}
