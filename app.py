@@ -1628,20 +1628,19 @@ def edit_transaction(transaction_id):
 
 @app.route('/fund_utilization_view')
 def fund_utilization_view():
+    """View fund utilization with year filtering"""
     # Get selected year from session
     selected_year = session.get('selected_year', datetime.now().year)
     
-    # Filter transactions by year (if BankTransaction has year column)
-    # If not, you'll need to add it first
+    # Filter transactions by year
     transactions = BankTransaction.query.filter(
         extract('year', BankTransaction.date) == selected_year
     ).order_by(BankTransaction.date.desc()).all()
-        
-    # Fetch all bank transactions from the database
-    transactions = BankTransaction.query.order_by(BankTransaction.date.desc()).all()
+    
+    # Calculate totals for selected year
     total_debits = sum(t.amount for t in transactions)
     
-    # Calculate vendor summaries
+    # Calculate vendor summaries for selected year
     vendor_totals = {}
     for transaction in transactions:
         payee = transaction.payee.strip()
@@ -1679,7 +1678,8 @@ def fund_utilization_view():
                          total_debits=total_debits,
                          vendor_summary=vendor_summary,
                          top_vendor_total=top_vendor_total,
-                         average_transaction=average_transaction)
+                         average_transaction=average_transaction,
+                         selected_year=selected_year)  # Add selected_year here
 
 
 @app.route('/add_bank_transaction', methods=['GET', 'POST'])
