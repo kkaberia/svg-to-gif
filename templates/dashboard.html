@@ -47,6 +47,61 @@
       color: #3498db;
     }
 
+    /* Year Selection */
+    .year-selector {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin: 2rem auto;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    .year-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .year-btn {
+      padding: 0.5rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .year-btn.active {
+      background-color: #3498db;
+      color: white;
+      border-color: #2980b9;
+    }
+
+    .year-btn.inactive {
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      border-color: #bdc3c7;
+    }
+
+    .year-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .year-info {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 6px;
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+      font-size: 0.9rem;
+    }
+
     /* Main Content */
     .container {
       max-width: 1200px;
@@ -225,6 +280,15 @@
         display: block;
         overflow-x: auto;
       }
+      
+      .year-buttons {
+        gap: 0.25rem;
+      }
+      
+      .year-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
     }
   </style>
 </head>
@@ -239,7 +303,29 @@
     <h1>Payment Dashboard</h1>
     <p>Welcome to your payment dashboard! Here you can view your payment history, total payments, and pending amounts for the year.</p>
 
+    <!-- Year Selection -->
+    <div class="year-selector">
+      <h3>Select Year to View</h3>
+      <div class="year-buttons">
+        {% for year in [2023, 2024, 2025, 2026] %}
+          <a href="{{ url_for('year_transition', year=year) }}" 
+             class="year-btn {{ 'active' if selected_year == year else 'inactive' }}">
+            {{ year }}
+          </a>
+        {% endfor %}
+      </div>
+      {% if selected_year != datetime.now().year %}
+      <div class="year-info">
+        <i class="fas fa-history"></i> Viewing historical data for {{ selected_year }}. 
+        <a href="{{ url_for('year_transition', year=datetime.now().year) }}" style="color: #3498db; font-weight: bold;">
+          Return to {{ datetime.now().year }}
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
     <!-- Summary Section -->
+    <h2>Summary for {{ selected_year }}</h2>
     <div class="summary">
       <div class="summary-item">
         <strong>Opening Balance</strong>

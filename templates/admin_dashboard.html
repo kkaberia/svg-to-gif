@@ -72,6 +72,59 @@
             font-weight: 600;
         }
 
+        /* Year Selection */
+        .year-selector {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .year-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .year-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .year-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .year-btn.inactive {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border-color: #bdc3c7;
+        }
+
+        .year-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .year-info {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
         /* Financial Summary */
         .summary {
             display: grid;
@@ -219,6 +272,15 @@
             h2 {
                 font-size: 1.5rem;
             }
+            
+            .year-buttons {
+                gap: 0.25rem;
+            }
+            
+            .year-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
         }
     </style>
 </head>
@@ -237,8 +299,29 @@
     </nav>
 
     <div class="container">
+        <!-- Year Selection -->
+        <div class="year-selector">
+            <h3>Viewing Data for: <span style="color: #3498db;">{{ selected_year }}</span></h3>
+            <div class="year-buttons">
+                {% for year in [2023, 2024, 2025, 2026] %}
+                    <a href="{{ url_for('year_transition', year=year) }}" 
+                       class="year-btn {{ 'active' if selected_year == year else 'inactive' }}">
+                        {{ year }}
+                    </a>
+                {% endfor %}
+            </div>
+            {% if selected_year != datetime.now().year %}
+            <div class="year-info">
+                <i class="fas fa-history"></i> Viewing historical data for {{ selected_year }}. 
+                <a href="{{ url_for('year_transition', year=datetime.now().year) }}" style="color: #3498db; font-weight: bold; margin-left: 0.5rem;">
+                    Return to {{ datetime.now().year }}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
         <!-- Financial Summary -->
-        <h3>Financial Summary</h3>
+        <h3>Financial Summary for {{ selected_year }}</h3>
         <div class="summary">
             <!-- First Line -->
             <div class="summary-item">
@@ -281,7 +364,7 @@
 
             <div class="table-container">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3>Payment Records</h3>
+                    <h3>Payment Records for {{ selected_year }}</h3>
                     <a href="{{ url_for('admin_add_payment') }}" class="add-payment-link">Add Payment on Behalf of User</a>
                 </div>
                 {% if payments %}
@@ -296,6 +379,7 @@
                                 <th>Method</th>
                                 <th>Origin Bank</th>
                                 <th>Months</th>
+                                <th>Year</th>
                                 <th>Edit</th>
                             </tr>
                         </thead>
@@ -310,19 +394,20 @@
                                 <td>{{ payment.payment_type }}</td>
                                 <td>{{ payment.origin_bank if payment.origin_bank else '' }}</td>
                                 <td>{{ payment.months if payment.months else '' }}</td>
+                                <td>{{ payment.year }}</td>
                                 <td><a href="{{ url_for('update_payment', payment_id=payment.id) }}">Edit</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 {% else %}
-                    <p class="no-data">No payment records found.</p>
+                    <p class="no-data">No payment records found for {{ selected_year }}.</p>
                 {% endif %}
             </div>
         </div>
 
         <!-- User Payments Overview -->
-        <h3>Members Payments Summary</h3>
+        <h3>Members Payments Summary for {{ selected_year }}</h3>
         <div class="table-container">
             <table>
                 <thead>
@@ -345,6 +430,7 @@
                         <td>{{ user_financial.pending | format_currency }}</td>
                         <td class="action-buttons">
                             <a href="{{ url_for('send_reminder', user_id=user_financial.user_id) }}">Send Reminder</a>
+                            <a href="{{ url_for('user_payment_summary', user_id=user_financial.user_id) }}">View Details</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -389,6 +475,16 @@
             {% endif %}
         </div>
         <a href="{{ url_for('add_user') }}" class="add-user-link">Add User</a>
+        
+        <!-- Database Fix Link -->
+        <div style="margin-top: 2rem; padding: 1rem; background-color: #f8f9fa; border-radius: 8px; text-align: center;">
+            <p style="color: #666; margin-bottom: 0.5rem;">
+                <i class="fas fa-database"></i> Having issues with year data?
+            </p>
+            <a href="{{ url_for('fix_year_column') }}" style="color: #e74c3c; font-weight: bold;">
+                Fix Year Column in Database
+            </a>
+        </div>
     </div>
 
     <!-- Chart Script -->
@@ -421,7 +517,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Financial Breakdown',
+                        text: 'Financial Breakdown for {{ selected_year }}',
                         font: {
                             size: 18
                         }
