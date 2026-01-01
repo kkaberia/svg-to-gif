@@ -1169,7 +1169,7 @@ def admin_dashboard():
     selected_year = session.get('selected_year', datetime.now().year)
     
     # Fetch payments for selected year
-    payments = db.session.query(Payment, User)\
+    payments = Payment.query\
         .join(User, Payment.user_id == User.id)\
         .filter(Payment.year == selected_year)\
         .order_by(desc(Payment.date)).all()
