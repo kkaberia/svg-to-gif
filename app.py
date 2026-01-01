@@ -35,6 +35,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from itsdangerous import URLSafeTimedSerializer
 from flask import jsonify
 from flask import Flask, render_template
+from sqlalchemy import extract  # Add this import
 # from email_templates import get_reminder_email_template
 # from payment_calculations import calculate_user_balance
 import logging
