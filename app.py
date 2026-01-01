@@ -1627,6 +1627,15 @@ def edit_transaction(transaction_id):
 
 @app.route('/fund_utilization_view')
 def fund_utilization_view():
+    # Get selected year from session
+    selected_year = session.get('selected_year', datetime.now().year)
+    
+    # Filter transactions by year (if BankTransaction has year column)
+    # If not, you'll need to add it first
+    transactions = BankTransaction.query.filter(
+        extract('year', BankTransaction.date) == selected_year
+    ).order_by(BankTransaction.date.desc()).all()
+        
     # Fetch all bank transactions from the database
     transactions = BankTransaction.query.order_by(BankTransaction.date.desc()).all()
     total_debits = sum(t.amount for t in transactions)

@@ -42,6 +42,61 @@
       color: #3498db;
     }
 
+    /* Year Selection */
+    .year-selector {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin: 0 auto 2rem auto;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    .year-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .year-btn {
+      padding: 0.5rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .year-btn.active {
+      background-color: #3498db;
+      color: white;
+      border-color: #2980b9;
+    }
+
+    .year-btn.inactive {
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      border-color: #bdc3c7;
+    }
+
+    .year-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .year-info {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 6px;
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+      font-size: 0.9rem;
+    }
+
     /* Fund Utilization Container */
     .fund-utilization-container {
       background-color: #fff;
@@ -133,6 +188,19 @@
       background-color: #f1f1f1;
     }
 
+    /* Vendor Summary Table */
+    .vendor-table {
+      margin-top: 2rem;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .vendor-table th {
+      background-color: #34495e;
+    }
+
     /* Flash Messages */
     .alert {
       padding: 12px;
@@ -163,6 +231,16 @@
         display: block;
         margin: 10px 0;
         font-size: 14px;
+      }
+
+      /* Year Selector */
+      .year-buttons {
+        gap: 0.25rem;
+      }
+      
+      .year-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
       }
 
       /* Fund Utilization Container */
@@ -214,6 +292,27 @@
     <a href="{{ url_for('logout') }}">Logout</a>
   </nav>
 
+  <!-- Year Selection -->
+  <div class="year-selector">
+    <h3>Viewing Expenses for: <span style="color: #3498db;">{{ selected_year if selected_year else datetime.now().year }}</span></h3>
+    <div class="year-buttons">
+      {% for year in [2025, 2026] %}
+        <a href="{{ url_for('year_transition', year=year) }}" 
+           class="year-btn {{ 'active' if (selected_year if selected_year else datetime.now().year) == year else 'inactive' }}">
+          {{ year }}
+        </a>
+      {% endfor %}
+    </div>
+    {% if (selected_year if selected_year else datetime.now().year) != datetime.now().year %}
+    <div class="year-info">
+      <i class="fas fa-history"></i> Viewing historical expenses for {{ selected_year if selected_year else datetime.now().year }}. 
+      <a href="{{ url_for('year_transition', year=datetime.now().year) }}" style="color: #3498db; font-weight: bold;">
+        Return to {{ datetime.now().year }}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
   <!-- Fund Utilization Container -->
   <div class="fund-utilization-container">
     <h1>Outgoing Payments - Bank Debits</h1>
@@ -230,35 +329,78 @@
     <!-- Summary Section -->
     <div class="summary">
       <div class="summary-item">
-        <strong>Total Expenses Paid so far in the current year 2025</strong>
+        <strong>Total Expenses for {{ selected_year if selected_year else datetime.now().year }}</strong>
         <span>KSH {{ total_debits | format_currency }}</span>
       </div>
+      {% if vendor_summary %}
+      <div class="summary-item">
+        <strong>Total Vendors</strong>
+        <span>{{ vendor_summary|length }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Total Transactions</strong>
+        <span>{{ transactions|length }}</span>
+      </div>
+      {% endif %}
     </div>
 
     <!-- Bank Transactions Table -->
     <h2>Outgoing Payments Transactions</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Narration</th>
-          <th>Amount</th>
-          <th>Payment Mode</th>
-          <th>Payee</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for transaction in transactions %}
-        <tr>
-          <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td>
-          <td>{{ transaction.narration }}</td>
-          <td>KSH {{ transaction.amount | format_currency }}</td>
-          <td>{{ transaction.payment_mode }}</td>
-          <td>{{ transaction.payee }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% if transactions %}
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Narration</th>
+            <th>Amount</th>
+            <th>Payment Mode</th>
+            <th>Payee</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transaction in transactions %}
+          <tr>
+            <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ transaction.narration }}</td>
+            <td>KSH {{ transaction.amount | format_currency }}</td>
+            <td>{{ transaction.payment_mode }}</td>
+            <td>{{ transaction.payee }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="text-align: center; color: #666; padding: 20px;">
+        No expense transactions found for {{ selected_year if selected_year else datetime.now().year }}.
+      </p>
+    {% endif %}
+
+    <!-- Vendor Summary -->
+    {% if vendor_summary %}
+    <div class="vendor-table">
+      <h2>Vendor Summary for {{ selected_year if selected_year else datetime.now().year }}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Vendor/Payee</th>
+            <th>Total Amount</th>
+            <th>Transaction Count</th>
+            <th>Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vendor in vendor_summary %}
+          <tr>
+            <td>{{ vendor.payee }}</td>
+            <td>KSH {{ vendor.total_amount | format_currency }}</td>
+            <td>{{ vendor.transaction_count }}</td>
+            <td>{{ "%.1f"|format(vendor.percentage) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
   </div>
 </body>
 </html>
