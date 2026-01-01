@@ -1323,16 +1323,22 @@ def members_summary():
 @app.route('/payment_records')
 @login_required
 def payment_records():
+    """View all payment records with year filtering"""
     # Check if user is admin
     current_user_obj = User.query.get(session['user_id'])
-    if not current_user_obj or current_user_obj.role != 'admin':  # Changed 'Admin' to 'admin'
+    if not current_user_obj or current_user_obj.role != 'admin':
         flash('Access denied. Admin privileges required.', 'error')
         return redirect(url_for('dashboard'))
     
-    # Get all payments with user information
-    payments = Payment.query.join(User).order_by(Payment.id.desc()).all()
+    # Get selected year from session
+    selected_year = session.get('selected_year', datetime.now().year)
     
-    # Calculate statistics
+    # Get all payments for selected year with user information
+    payments = Payment.query.join(User)\
+        .filter(Payment.year == selected_year)\
+        .order_by(Payment.date.desc()).all()
+    
+    # Calculate statistics for selected year
     total_amount = sum(payment.amount for payment in payments)
     average_payment = total_amount / len(payments) if payments else 0
     
@@ -1340,7 +1346,8 @@ def payment_records():
         'payment_records.html',
         payments=payments,
         total_amount=total_amount,
-        average_payment=average_payment
+        average_payment=average_payment,
+        selected_year=selected_year
     )
 # Update the navigation in other pages to include the new link
 

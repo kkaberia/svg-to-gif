@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Records - Estate Portal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #3498db;
+        }
+
+        /* Container */
+        .container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 2rem;
+            font-weight: 600;
+        }
+
+        /* Statistics */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-item strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        .stat-item span {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        /* Table Container */
+        .table-container {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        td {
+            color: #555;
+        }
+
+        /* Status Badges */
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        /* Buttons */
+        .back-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* No Data */
+        .no-data {
+            text-align: center;
+            color: #777;
+            padding: 3rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        /* Year Selection */
+        .year-selector {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .year-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .year-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .year-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .year-btn.inactive {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border-color: #bdc3c7;
+        }
+
+        .year-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .year-info {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .year-buttons {
+                gap: 0.25rem;
+            }
+            
+            .year-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        {% if 'user_id' not in session %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}">My Dashboard</a>
+            {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+                <a href="{{ url_for('payment_records') }}">Payment Records</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+    </nav>
+
+    <div class="container">
+        <h1>Payment Records</h1>
+        
+        <!-- Year Selection -->
+        <div class="year-selector">
+            <h3>Viewing Data for: <span style="color: #3498db;">{{ selected_year if selected_year else datetime.now().year }}</span></h3>
+            <div class="year-buttons">
+                {% for year in [2023, 2024, 2025, 2026] %}
+                    <a href="{{ url_for('year_transition', year=year) }}" 
+                       class="year-btn {{ 'active' if (selected_year if selected_year else datetime.now().year) == year else 'inactive' }}">
+                        {{ year }}
+                    </a>
+                {% endfor %}
+            </div>
+            {% if (selected_year if selected_year else datetime.now().year) != datetime.now().year %}
+            <div class="year-info">
+                <i class="fas fa-history"></i> Viewing historical data for {{ selected_year if selected_year else datetime.now().year }}. 
+                <a href="{{ url_for('year_transition', year=datetime.now().year) }}" style="color: #3498db; font-weight: bold;">
+                    Return to {{ datetime.now().year }}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats">
+            <div class="stat-item">
+                <strong>Total Payments</strong>
+                <span>{{ payments|length }}</span>
+            </div>
+            <div class="stat-item">
+                <strong>Total Amount</strong>
+                <span>KSH {{ total_amount | format_currency }}</span>
+            </div>
+            <div class="stat-item">
+                <strong>Average Payment</strong>
+                <span>KSH {{ average_payment | format_currency }}</span>
+            </div>
+            <div class="stat-item">
+                <strong>Year</strong>
+                <span>{{ selected_year if selected_year else datetime.now().year }}</span>
+            </div>
+        </div>
+
+        <!-- Payment Records Table -->
+        <div class="table-container">
+            <h2>All Payment Records for {{ selected_year if selected_year else datetime.now().year }}</h2>
+            
+            {% if payments %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>User</th>
+                            <th>House No.</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Origin Bank</th>
+                            <th>Months Covered</th>
+                            <th>Year</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>{{ payment.id }}</td>
+                            <td>{{ payment.date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ payment.user.first_name }} {{ payment.user.last_name }}</td>
+                            <td>{{ payment.user.house_number }}</td>
+                            <td>KSH {{ payment.amount | format_currency }}</td>
+                            <td>{{ payment.payment_type }}</td>
+                            <td>{{ payment.origin_bank if payment.origin_bank else 'N/A' }}</td>
+                            <td>{{ payment.months if payment.months else 'N/A' }}</td>
+                            <td>{{ payment.year if payment.year else selected_year }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-data">
+                    <i class="fas fa-receipt fa-3x" style="color: #ddd; margin-bottom: 1rem;"></i>
+                    <h3>No Payment Records Found</h3>
+                    <p>No payment records available for {{ selected_year if selected_year else datetime.now().year }}.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Back Button -->
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="{{ url_for('admin_dashboard') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Admin Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>
