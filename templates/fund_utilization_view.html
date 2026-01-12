@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fund Utilization View - Estate Portal</title>
+  <title>Fund Utilization - Estate Portal</title>
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Font Awesome for Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Global Styles */
     body {
@@ -16,25 +18,177 @@
       padding: 0;
       background-color: #f4f4f9;
       color: #333;
-      line-height: 1.6;
+      line-height: 1.5;
+    }
+
+    /* Print-specific styles */
+    @media print {
+        /* Hide non-printable elements */
+        .no-print, nav, .filter-section, .vendor-summary, .export-section,
+        .btn, button, .chart-section, .modal, .table-actions,
+        .vendor-controls, .filter-actions, .export-buttons {
+            display: none !important;
+        }
+        
+        /* Clean up the page for printing */
+        body {
+            font-size: 12pt !important;
+            background: white !important;
+            color: black !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            line-height: 1.2 !important;
+        }
+        
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+        }
+        
+        /* Fund Utilization Container */
+        .fund-utilization-container {
+            background-color: white !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            margin-bottom: 0 !important;
+        }
+        
+        h1 {
+            font-size: 24pt !important;
+            text-align: center !important;
+            margin-bottom: 20px !important;
+            color: black !important;
+            border-bottom: 2px solid #000 !important;
+            padding-bottom: 10px !important;
+        }
+        
+        h2 {
+            font-size: 16pt !important;
+            color: black !important;
+            border-bottom: 1px solid #666 !important;
+            page-break-after: avoid !important;
+        }
+        
+        /* Make tables print nicely */
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 10pt !important;
+            margin-top: 15px !important;
+            margin-bottom: 20px !important;
+            page-break-inside: avoid !important;
+        }
+        
+        th, td {
+            border: 1px solid #000 !important;
+            padding: 6px 8px !important;
+            text-align: left !important;
+        }
+        
+        th {
+            background-color: #f2f2f2 !important;
+            -webkit-print-color-adjust: exact !important;
+            font-weight: bold !important;
+            color: black !important;
+        }
+        
+        /* Summary section for print */
+        .summary-grid {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 10px !important;
+            margin-bottom: 20px !important;
+            page-break-inside: avoid !important;
+        }
+        
+        .summary-item {
+            background-color: #f9f9f9 !important;
+            padding: 10px !important;
+            border: 1px solid #ccc !important;
+            text-align: center !important;
+        }
+        
+        .summary-item span {
+            font-size: 14pt !important;
+            display: block !important;
+            margin-top: 5px !important;
+        }
+        
+        /* Add page break after the report */
+        .report-end {
+            page-break-after: always !important;
+        }
+        
+        /* Print header - only shows when printing */
+        .print-header {
+            display: block !important;
+            text-align: center !important;
+            margin-bottom: 30px !important;
+            padding-bottom: 15px !important;
+            border-bottom: 2px solid #000 !important;
+        }
+        
+        .print-header h2 {
+            font-size: 20pt !important;
+            margin-bottom: 5px !important;
+            border-bottom: none !important;
+        }
+        
+        /* Hide table actions column */
+        table th:nth-child(6),
+        table td:nth-child(6) {
+            display: none !important;
+        }
+        
+        /* Ensure URLs are visible */
+        a[href]::after {
+            content: " (" attr(href) ")" !important;
+        }
+        
+        /* Prevent page breaks inside important elements */
+        h1, h2, h3 {
+            page-break-after: avoid !important;
+        }
+        
+        tr {
+            page-break-inside: avoid !important;
+        }
+        
+        /* Print footer */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                color: #666;
+            }
+        }
+    }
+    
+    /* Hide print header on screen */
+    .print-header {
+        display: none;
     }
 
     /* Navigation Bar */
     nav {
       background-color: #2c3e50;
-      padding: 15px 20px;
+      padding: 12px 15px;
       text-align: center;
-      margin-bottom: 30px;
-      width: 100%;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     nav a {
       color: #fff;
       text-decoration: none;
-      margin: 0 15px;
+      margin: 0 12px;
       font-weight: 500;
-      font-size: 16px;
+      font-size: 14px;
       transition: color 0.3s ease;
     }
 
@@ -42,78 +196,33 @@
       color: #3498db;
     }
 
-    /* Year Selection */
-    .year-selector {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      margin: 0 auto 2rem auto;
-      max-width: 800px;
-      text-align: center;
+    nav a.active {
+      color: #3498db;
+      font-weight: 600;
     }
 
-    .year-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .year-btn {
-      padding: 0.5rem 1.5rem;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
-    }
-
-    .year-btn.active {
-      background-color: #3498db;
-      color: white;
-      border-color: #2980b9;
-    }
-
-    .year-btn.inactive {
-      background-color: #ecf0f1;
-      color: #2c3e50;
-      border-color: #bdc3c7;
-    }
-
-    .year-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .year-info {
-      margin-top: 1rem;
-      padding: 0.75rem;
-      border-radius: 6px;
-      background-color: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeaa7;
-      font-size: 0.9rem;
+    /* Main Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 15px;
     }
 
     /* Fund Utilization Container */
     .fund-utilization-container {
       background-color: #fff;
-      padding: 20px;
+      padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      max-width: 800px;
-      width: 100%;
-      margin: 0 auto;
-      text-align: center;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
     }
 
     h1 {
-      font-size: 24px;
-      margin-bottom: 15px;
+      font-size: 28px;
+      margin-bottom: 20px;
       color: #2c3e50;
-      font-weight: 600;
+      font-weight: 700;
+      text-align: center;
     }
 
     h2 {
@@ -121,63 +230,398 @@
       margin-bottom: 15px;
       color: #2c3e50;
       font-weight: 600;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    /* Filter Section - Updated for Year Filter */
+    .filter-section {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-group label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-size: 14px;
+    }
+
+    .filter-control {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      background-color: white;
+    }
+
+    .filter-control:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-primary {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background-color: #95a5a6;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: #7f8c8d;
+    }
+
+    .btn-success {
+      background-color: #27ae60;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #219653;
     }
 
     /* Summary Section */
-    .summary {
+    .summary-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
     }
 
     .summary-item {
       background-color: #f8f9fa;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
       text-align: center;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-left: 4px solid #3498db;
     }
 
     .summary-item:hover {
       transform: translateY(-5px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-item.total {
+      border-left-color: #e74c3c;
+    }
+
+    .summary-item.vendor {
+      border-left-color: #27ae60;
+    }
+
+    .summary-item.avg {
+      border-left-color: #f39c12;
+    }
+
+    .summary-item.count {
+      border-left-color: #9b59b6;
     }
 
     .summary-item strong {
       display: block;
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
+      font-size: 14px;
+      margin-bottom: 8px;
       color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .summary-item span {
-      font-size: 1.25rem;
+      font-size: 24px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .summary-item.total span {
+      color: #e74c3c;
+    }
+
+    .summary-item.vendor span {
+      color: #27ae60;
+    }
+
+    .summary-item.avg span {
+      color: #f39c12;
+    }
+
+    .summary-item.count span {
+      color: #9b59b6;
+    }
+
+    .summary-meta {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* Year Filter Section */
+    .year-filter-section {
+      background-color: #e8f4fc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #3498db;
+    }
+
+    .year-filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .year-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
       font-weight: 600;
-      color: #3498db;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-color: #ecf0f1;
+      color: #2c3e50;
+    }
+
+    .year-btn:hover {
+      background-color: #d5dbdb;
+      transform: translateY(-2px);
+    }
+
+    .year-btn.active {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .year-btn.all-time {
+      background-color: #9b59b6;
+      color: white;
+    }
+
+    .year-btn.all-time:hover {
+      background-color: #8e44ad;
+    }
+
+    /* Chart Section */
+    .chart-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    @media (max-width: 768px) {
+      .chart-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .chart-wrapper {
+      height: 300px;
+      position: relative;
+    }
+
+    /* Vendor Summary Section */
+    .vendor-summary {
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+      margin-bottom: 25px;
+    }
+
+    .vendor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .vendor-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .vendor-count-badge {
+      background-color: #3498db;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .vendor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .vendor-card {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .vendor-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      background-color: #e8f4fc;
+    }
+
+    .vendor-card.selected {
+      border-left-color: #e74c3c;
+      background-color: #ffeaea;
+    }
+
+    .vendor-name {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+
+    .vendor-amount {
+      font-size: 18px;
+      font-weight: 700;
+      color: #27ae60;
+    }
+
+    .vendor-count {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .vendor-percentage {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #666;
+      background-color: #e8e8e8;
+      padding: 3px 8px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    /* Table Section */
+    .table-section {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .table-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-count {
+      font-size: 14px;
+      color: #666;
     }
 
     /* Table Styling */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      border-radius: 12px;
+      margin-top: 15px;
+      border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      font-size: 14px;
     }
 
     th, td {
-      padding: 12px;
+      padding: 12px 15px;
       text-align: left;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #e0e0e0;
     }
 
     th {
       background-color: #2c3e50;
       color: #fff;
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     tr:nth-child(even) {
@@ -188,219 +632,1249 @@
       background-color: #f1f1f1;
     }
 
-    /* Vendor Summary Table */
-    .vendor-table {
-      margin-top: 2rem;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    .amount-cell {
+      font-weight: 600;
+      color: #e74c3c;
     }
 
-    .vendor-table th {
-      background-color: #34495e;
+    .vendor-cell {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .date-cell {
+      color: #666;
+      font-family: 'Roboto', monospace;
     }
 
     /* Flash Messages */
     .alert {
-      padding: 12px;
+      padding: 15px;
       border-radius: 8px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       font-weight: 500;
       text-align: center;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     .alert-success {
       background-color: #d4edda;
       color: #155724;
+      border-left: 4px solid #27ae60;
     }
 
     .alert-danger {
       background-color: #f8d7da;
       color: #721c24;
+      border-left: 4px solid #e74c3c;
+    }
+
+    .alert-info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border-left: 4px solid #3498db;
+    }
+
+    /* Export Section */
+    .export-section {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-export {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-export.excel {
+      background-color: #27ae60;
+      color: white;
+    }
+
+    .btn-export.pdf {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .btn-export.print {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .btn-export:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .close-modal {
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .close-modal:hover {
+      color: #e74c3c;
     }
 
     /* Responsive Styles */
     @media (max-width: 768px) {
-      /* Navigation Bar */
-      nav {
-        padding: 10px;
+      .container {
+        padding: 0 10px;
       }
 
-      nav a {
-        display: block;
-        margin: 10px 0;
-        font-size: 14px;
-      }
-
-      /* Year Selector */
-      .year-buttons {
-        gap: 0.25rem;
-      }
-      
-      .year-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-      }
-
-      /* Fund Utilization Container */
       .fund-utilization-container {
         padding: 15px;
       }
 
       h1 {
-        font-size: 20px;
+        font-size: 22px;
       }
 
       h2 {
         font-size: 18px;
       }
 
-      /* Summary Section */
-      .summary {
+      .filter-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
       }
 
-      .summary-item {
-        padding: 1rem;
+      .vendor-grid {
+        grid-template-columns: 1fr;
       }
 
-      .summary-item strong {
-        font-size: 0.9rem;
+      .table-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
       }
 
-      .summary-item span {
-        font-size: 1.1rem;
+      .export-buttons {
+        flex-direction: column;
       }
 
-      /* Table Responsiveness */
+      .year-filter-buttons {
+        flex-direction: column;
+      }
+
       table {
         display: block;
         overflow-x: auto;
         white-space: nowrap;
+      }
+      
+      /* Adjust print layout for mobile */
+      @media print {
+        .summary-grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
       }
     }
   </style>
 </head>
 <body>
   <!-- Navigation Bar -->
-  <nav>
+  <nav class="no-print">
     <a href="{{ url_for('home') }}">Home</a>
-    <a href="{{ url_for('fund_utilization_view') }}" class="active">Funds Utilization</a>
-    <a href="{{ url_for('dashboard') }}">My Dashboard</a>
+    <a href="{{ url_for('fund_utilization_view') }}" class="active">Funds</a>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('admin_dashboard') }}">Admin</a>
     <a href="{{ url_for('logout') }}">Logout</a>
   </nav>
 
-  <!-- Year Selection -->
-  <div class="year-selector">
-    <h3>Viewing Expenses for: <span style="color: #3498db;">{{ selected_year if selected_year else datetime.now().year }}</span></h3>
-    <div class="year-buttons">
-      {% for year in [2025, 2026] %}
-        <a href="{{ url_for('year_transition', year=year) }}" 
-           class="year-btn {{ 'active' if (selected_year if selected_year else datetime.now().year) == year else 'inactive' }}">
-          {{ year }}
-        </a>
-      {% endfor %}
-    </div>
-    {% if (selected_year if selected_year else datetime.now().year) != datetime.now().year %}
-    <div class="year-info">
-      <i class="fas fa-history"></i> Viewing historical expenses for {{ selected_year if selected_year else datetime.now().year }}. 
-      <a href="{{ url_for('year_transition', year=datetime.now().year) }}" style="color: #3498db; font-weight: bold;">
-        Return to {{ datetime.now().year }}
-      </a>
-    </div>
-    {% endif %}
-  </div>
-
-  <!-- Fund Utilization Container -->
-  <div class="fund-utilization-container">
-    <h1>Outgoing Payments - Bank Debits</h1>
-
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <!-- Summary Section -->
-    <div class="summary">
-      <div class="summary-item">
-        <strong>Total Expenses for {{ selected_year if selected_year else datetime.now().year }}</strong>
-        <span>KSH {{ total_debits | format_currency }}</span>
-      </div>
-      {% if vendor_summary %}
-      <div class="summary-item">
-        <strong>Total Vendors</strong>
-        <span>{{ vendor_summary|length }}</span>
-      </div>
-      <div class="summary-item">
-        <strong>Total Transactions</strong>
-        <span>{{ transactions|length }}</span>
-      </div>
-      {% endif %}
+  <div class="container">
+    <!-- Print Header - Only shows when printing -->
+    <div class="print-header">
+      <h2>Plateau Cluster - Fund Utilization Report</h2>
+      <p>Generated on: <span id="current-date"></span></p>
     </div>
 
-    <!-- Bank Transactions Table -->
-    <h2>Outgoing Payments Transactions</h2>
-    {% if transactions %}
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Narration</th>
-            <th>Amount</th>
-            <th>Payment Mode</th>
-            <th>Payee</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for transaction in transactions %}
-          <tr>
-            <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ transaction.narration }}</td>
-            <td>KSH {{ transaction.amount | format_currency }}</td>
-            <td>{{ transaction.payment_mode }}</td>
-            <td>{{ transaction.payee }}</td>
-          </tr>
+    <!-- Fund Utilization Container -->
+    <div class="fund-utilization-container">
+      <!-- Quick Print Button -->
+      <div style="text-align: right; margin-bottom: 20px;" class="no-print">
+        <button onclick="window.print()" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+          🖨️ Print / Save as PDF
+        </button>
+        <p style="font-size: 12px; color: #666; margin-top: 5px;">
+          Tip: Use browser's Print dialog and choose "Save as PDF" to export
+        </p>
+      </div>
+
+      <h1><i class="fas fa-chart-pie"></i> Fund Utilization Dashboard</h1>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+              {{ message }}
+            </div>
           {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p style="text-align: center; color: #666; padding: 20px;">
-        No expense transactions found for {{ selected_year if selected_year else datetime.now().year }}.
-      </p>
-    {% endif %}
+        {% endif %}
+      {% endwith %}
 
-    <!-- Vendor Summary -->
-    {% if vendor_summary %}
-    <div class="vendor-table">
-      <h2>Vendor Summary for {{ selected_year if selected_year else datetime.now().year }}</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Vendor/Payee</th>
-            <th>Total Amount</th>
-            <th>Transaction Count</th>
-            <th>Percentage</th>
-          </tr>
-        </thead>
-        <tbody>
+      <!-- Year Filter Section -->
+      <div class="year-filter-section no-print">
+        <h3><i class="fas fa-calendar-alt"></i> Filter by Year</h3>
+        <div class="year-filter-buttons" id="yearFilterButtons">
+          <!-- Year buttons will be dynamically generated -->
+        </div>
+        <p style="text-align: center; margin-top: 10px; font-size: 13px; color: #666;">
+          Currently viewing: <span id="currentYearDisplay" style="font-weight: 600;">All Years</span>
+        </p>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="filter-section no-print">
+        <h2><i class="fas fa-filter"></i> Filter Transactions</h2>
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label for="vendorFilter"><i class="fas fa-building"></i> Filter by Vendor</label>
+            <select id="vendorFilter" class="filter-control">
+              <option value="all">All Vendors</option>
+              {% for vendor in vendor_summary %}
+              <option value="{{ vendor.payee }}">{{ vendor.payee }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="dateFromFilter"><i class="fas fa-calendar-alt"></i> Date From</label>
+            <input type="date" id="dateFromFilter" class="filter-control">
+          </div>
+          
+          <div class="filter-group">
+            <label for="dateToFilter"><i class="fas fa-calendar-alt"></i> Date To</label>
+            <input type="date" id="dateToFilter" class="filter-control">
+          </div>
+          
+          <div class="filter-group">
+            <label for="amountFilter"><i class="fas fa-money-bill"></i> Amount Range</label>
+            <select id="amountFilter" class="filter-control">
+              <option value="all">All Amounts</option>
+              <option value="0-10000">0 - 10,000</option>
+              <option value="10000-50000">10,000 - 50,000</option>
+              <option value="50000-100000">50,000 - 100,000</option>
+              <option value="100000+">100,000+</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="filter-actions">
+          <button class="btn btn-secondary" onclick="resetFilters()">
+            <i class="fas fa-redo"></i> Reset Filters
+          </button>
+          <button class="btn btn-primary" onclick="applyFilters()">
+            <i class="fas fa-search"></i> Apply Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary Section -->
+      <div class="summary-grid">
+        <div class="summary-item total">
+          <strong>Total Expenses <span id="yearText">for Selected Period</span></strong>
+          <span id="totalExpenses">KSH {{ total_debits | format_currency }}</span>
+          <div class="summary-meta">
+            <i class="fas fa-receipt"></i> <span id="transactionCount">{{ transactions|length }}</span> transactions
+          </div>
+        </div>
+        
+        <div class="summary-item vendor">
+          <strong>Top Vendor</strong>
+          <span id="topVendorAmount">KSH {{ top_vendor_total | format_currency if top_vendor_total else 0 | format_currency }}</span>
+          <div class="summary-meta">
+            <i class="fas fa-building"></i> <span id="vendorCount">{{ vendor_summary|length }}</span> vendors
+          </div>
+        </div>
+        
+        <div class="summary-item avg">
+          <strong>Average Payment</strong>
+          <span id="averagePayment">KSH {{ average_transaction | format_currency if average_transaction else 0 | format_currency }}</span>
+          <div class="summary-meta">
+            <i class="fas fa-calculator"></i> Per transaction
+          </div>
+        </div>
+        
+        <div class="summary-item count">
+          <strong>Filtered Results</strong>
+          <span id="filteredCount">{{ transactions|length }}</span>
+          <div class="summary-meta">
+            <i class="fas fa-chart-bar"></i> Matching transactions
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="chart-section no-print">
+        <div class="chart-container">
+          <h3><i class="fas fa-chart-pie"></i> Vendor Distribution</h3>
+          <div class="chart-wrapper">
+            <canvas id="vendorChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="chart-container">
+          <h3><i class="fas fa-chart-line"></i> Monthly Expenses</h3>
+          <div class="chart-wrapper">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vendor Summary Section -->
+      <div class="vendor-summary no-print">
+        <div class="vendor-header">
+          <h2><i class="fas fa-users"></i> Vendor Analysis</h2>
+          <div class="vendor-controls">
+            <span class="vendor-count-badge" id="vendorCountBadge">{{ vendor_summary|length }}</span>
+            <select id="vendorSort" class="filter-control" onchange="sortVendors()">
+              <option value="amount-desc">Amount (High to Low)</option>
+              <option value="amount-asc">Amount (Low to High)</option>
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="name-desc">Name (Z-A)</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="vendor-grid" id="vendorGrid">
           {% for vendor in vendor_summary %}
-          <tr>
-            <td>{{ vendor.payee }}</td>
-            <td>KSH {{ vendor.total_amount | format_currency }}</td>
-            <td>{{ vendor.transaction_count }}</td>
-            <td>{{ "%.1f"|format(vendor.percentage) }}%</td>
-          </tr>
+          <div class="vendor-card" data-vendor="{{ vendor.payee }}" onclick="filterByVendor('{{ vendor.payee }}')">
+            <div class="vendor-name">{{ vendor.payee }}</div>
+            <div class="vendor-amount">KSH {{ vendor.total_amount | format_currency }}</div>
+            <div class="vendor-count">{{ vendor.transaction_count }} payment{% if vendor.transaction_count > 1 %}s{% endif %}</div>
+            {% if vendor.percentage %}
+            <div class="vendor-percentage">
+              {{ "%.1f"|format(vendor.percentage) }}% of total
+            </div>
+            {% endif %}
+          </div>
           {% endfor %}
-        </tbody>
-      </table>
+        </div>
+      </div>
+
+      <!-- Bank Transactions Table -->
+      <div class="table-section">
+        <div class="table-header">
+          <h2><i class="fas fa-list-alt"></i> Transaction Details</h2>
+          <div class="table-controls">
+            <span class="table-count" id="tableCount">Showing {{ transactions|length }} of {{ transactions|length }} transactions</span>
+            <div class="table-actions no-print">
+              <select id="tableSort" class="filter-control" onchange="sortTable()">
+                <option value="date-desc">Date (Newest First)</option>
+                <option value="date-asc">Date (Oldest First)</option>
+                <option value="amount-desc">Amount (High to Low)</option>
+                <option value="amount-asc">Amount (Low to High)</option>
+                <option value="vendor-asc">Vendor (A-Z)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <table id="transactionsTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Year</th>
+              <th>Vendor</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+              <th class="no-print">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsBody">
+            {% for transaction in transactions %}
+            <tr data-vendor="{{ transaction.payee }}" 
+                data-date="{{ transaction.date.strftime('%Y-%m-%d') }}"
+                data-year="{{ transaction.date.strftime('%Y') }}"
+                data-amount="{{ transaction.amount }}">
+              <td class="date-cell">{{ transaction.date.strftime('%Y-%m-%d') }}</td>
+              <td class="date-cell">{{ transaction.date.strftime('%Y') }}</td>
+              <td class="vendor-cell">{{ transaction.payee }}</td>
+              <td>{{ transaction.narration }}</td>
+              <td class="amount-cell">KSH {{ transaction.amount | format_currency }}</td>
+              <td>{{ transaction.payment_mode }}</td>
+              <td class="no-print">
+                <button class="btn btn-primary btn-small" onclick="viewTransactionDetails({{ transaction.id }})" style="padding: 5px 10px; font-size: 12px;">
+                  <i class="fas fa-eye"></i> View
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Export Section -->
+      <div class="export-section no-print">
+        <h3><i class="fas fa-download"></i> Export Data</h3>
+        <div class="export-buttons">
+          <button class="btn-export excel" onclick="exportToExcel()">
+            <i class="fas fa-file-excel"></i> Export to Excel
+          </button>
+          <button class="btn-export print" onclick="window.print()">
+            <i class="fas fa-print"></i> Print / Save as PDF
+          </button>
+        </div>
+        <p style="font-size: 13px; color: #666; margin-top: 15px;">
+          <strong>Note:</strong> Use the Print button above and select "Save as PDF" in your browser's print dialog to export as PDF.
+        </p>
+      </div>
     </div>
-    {% endif %}
   </div>
+
+  <!-- Transaction Details Modal -->
+  <div id="transactionModal" class="modal no-print">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Transaction Details</div>
+        <div class="close-modal" onclick="closeModal()">&times;</div>
+      </div>
+      <div id="modalContent">
+        <!-- Dynamic content will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Store original data
+    const originalTransactions = [
+    {% for transaction in transactions %}
+    {
+        id: {{ transaction.id }},
+        date: '{{ transaction.date.strftime("%Y-%m-%dT%H:%M:%S") if transaction.date else "" }}',
+        payee: '{{ transaction.payee|replace("'", "\\'")|default("") }}',
+        narration: '{{ transaction.narration|replace("'", "\\'")|default("") }}',
+        amount: {{ transaction.amount }},
+        payment_mode: '{{ transaction.payment_mode|replace("'", "\\'")|default("") }}'
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+    ];
+
+    // Calculate vendor summary from transactions
+    const vendorMap = {};
+    originalTransactions.forEach(transaction => {
+        const vendor = transaction.payee;
+        if (!vendorMap[vendor]) {
+            vendorMap[vendor] = {
+                total_amount: 0,
+                transaction_count: 0,
+                payee: vendor
+            };
+        }
+        vendorMap[vendor].total_amount += transaction.amount;
+        vendorMap[vendor].transaction_count++;
+    });
+
+    const originalVendors = Object.values(vendorMap);
+    
+    // Calculate percentages
+    const totalAmount = originalTransactions.reduce((sum, t) => sum + t.amount, 0);
+    originalVendors.forEach(vendor => {
+        vendor.percentage = totalAmount > 0 ? (vendor.total_amount / totalAmount) * 100 : 0;
+    });
+
+    // Sort by amount descending
+    originalVendors.sort((a, b) => b.total_amount - a.total_amount);
+    
+    let filteredTransactions = [...originalTransactions];
+    let filteredVendors = [...originalVendors];
+    let currentYearFilter = 'all'; // 'all', or specific year like '2025'
+    
+    // Initialize charts
+    let vendorChart, monthlyChart;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set current date for print header
+      document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      // Check if we have data
+      if (!originalTransactions || originalTransactions.length === 0) {
+        console.warn('No transaction data available');
+        document.getElementById('transactionsBody').innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                    <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                    No transaction data available
+                </td>
+            </tr>
+        `;
+        document.getElementById('yearFilterButtons').innerHTML = `
+          <button class="year-btn active" onclick="filterByYear('all')">All Years</button>
+        `;
+        return;
+      }
+
+      if (!originalVendors || originalVendors.length === 0) {
+        console.warn('No vendor data available');
+        document.getElementById('vendorGrid').innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                No vendor data available
+            </div>
+        `;
+      }
+      
+      // Extract unique years from transactions
+      const years = new Set();
+      originalTransactions.forEach(transaction => {
+        if (transaction.date) {
+          const year = new Date(transaction.date).getFullYear();
+          years.add(year);
+        }
+      });
+      
+      // Convert to array and sort descending
+      const sortedYears = Array.from(years).sort((a, b) => b - a);
+      
+      // Generate year filter buttons
+      const yearButtonsContainer = document.getElementById('yearFilterButtons');
+      let yearButtonsHTML = '';
+      
+      // Add "All Years" button
+      yearButtonsHTML += `<button class="year-btn all-time active" onclick="filterByYear('all')">All Years</button>`;
+      
+      // Add buttons for each year
+      sortedYears.forEach(year => {
+        yearButtonsHTML += `<button class="year-btn" onclick="filterByYear(${year})">${year}</button>`;
+      });
+      
+      yearButtonsContainer.innerHTML = yearButtonsHTML;
+      
+      // Calculate and set top vendor total for the summary
+      const topVendor = originalVendors[0];
+      if (topVendor) {
+        document.getElementById('topVendorAmount').textContent = `KSH ${formatCurrency(topVendor.total_amount)}`;
+      }
+      
+      // Calculate and set average transaction
+      const averageTransaction = originalTransactions.length > 0 ? totalAmount / originalTransactions.length : 0;
+      document.getElementById('averagePayment').textContent = `KSH ${formatCurrency(averageTransaction)}`;
+      
+      // Update the year text in the summary
+      updateYearText();
+      
+      initializeCharts();
+      updateSummary();
+    });
+    
+    function filterByYear(year) {
+      currentYearFilter = year;
+      
+      // Update active button
+      document.querySelectorAll('.year-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Find and activate the clicked button
+      const buttons = document.querySelectorAll('.year-btn');
+      buttons.forEach(btn => {
+        if (btn.textContent.includes(year === 'all' ? 'All Years' : year.toString())) {
+          btn.classList.add('active');
+        }
+      });
+      
+      // Update display text
+      const displayText = year === 'all' ? 'All Years' : `Year ${year}`;
+      document.getElementById('currentYearDisplay').textContent = displayText;
+      
+      // Update the year text in the summary
+      updateYearText();
+      
+      // Reapply all filters
+      applyFilters();
+    }
+    
+    function updateYearText() {
+      const yearText = document.getElementById('yearText');
+      if (currentYearFilter === 'all') {
+        yearText.textContent = 'for All Years';
+      } else {
+        yearText.textContent = `for ${currentYearFilter}`;
+      }
+    }
+    
+    function initializeCharts() {
+      // Vendor Distribution Chart
+      const vendorCtx = document.getElementById('vendorChart').getContext('2d');
+      vendorChart = new Chart(vendorCtx, {
+        type: 'doughnut',
+        data: getVendorChartData(),
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                font: {
+                  size: 11
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  label += 'KSH ' + context.parsed.toLocaleString();
+                  return label;
+                }
+              }
+            }
+          },
+          cutout: '60%'
+        }
+      });
+      
+      // Monthly Expenses Chart
+      const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+      monthlyChart = new Chart(monthlyCtx, {
+        type: 'bar',
+        data: getMonthlyChartData(),
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return 'KSH ' + context.parsed.y.toLocaleString();
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return 'KSH ' + value.toLocaleString();
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    function getVendorChartData() {
+      if (!filteredVendors || filteredVendors.length === 0) {
+        return {
+          labels: ['No Data'],
+          datasets: [{
+            data: [1],
+            backgroundColor: ['#95a5a6'],
+            borderColor: '#fff',
+            borderWidth: 2
+          }]
+        };
+      }
+
+      const topVendors = filteredVendors.slice(0, 8);
+      const others = filteredVendors.slice(8);
+      const otherTotal = others.reduce((sum, v) => sum + v.total_amount, 0);
+      
+      const labels = topVendors.map(v => v.payee);
+      const data = topVendors.map(v => v.total_amount);
+      
+      if (otherTotal > 0) {
+        labels.push('Others');
+        data.push(otherTotal);
+      }
+      
+      const colors = [
+        '#3498db', '#27ae60', '#e74c3c', '#f39c12', 
+        '#9b59b6', '#1abc9c', '#d35400', '#34495e',
+        '#7f8c8d'
+      ];
+      
+      return {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors.slice(0, labels.length),
+          borderColor: '#fff',
+          borderWidth: 2
+        }]
+      };
+    }
+    
+    function getMonthlyChartData() {
+      if (!filteredTransactions || filteredTransactions.length === 0) {
+        return {
+          labels: ['No Data'],
+          datasets: [{
+            label: 'Monthly Expenses',
+            data: [0],
+            backgroundColor: '#95a5a6',
+            borderColor: '#7f8c8d',
+            borderWidth: 1
+          }]
+        };
+      }
+
+      // Group transactions by month
+      const monthlyData = {};
+      filteredTransactions.forEach(transaction => {
+        if (!transaction.date) return;
+        
+        const date = new Date(transaction.date);
+        if (isNaN(date.getTime())) return;
+        
+        const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+        
+        if (!monthlyData[monthYear]) {
+          monthlyData[monthYear] = 0;
+        }
+        monthlyData[monthYear] += transaction.amount;
+      });
+      
+      const labels = Object.keys(monthlyData);
+      const data = Object.values(monthlyData);
+      
+      return {
+        labels: labels,
+        datasets: [{
+          label: 'Monthly Expenses',
+          data: data,
+          backgroundColor: '#3498db',
+          borderColor: '#2980b9',
+          borderWidth: 1
+        }]
+      };
+    }
+    
+    function applyFilters() {
+      const vendorFilter = document.getElementById('vendorFilter').value;
+      const dateFrom = document.getElementById('dateFromFilter').value;
+      const dateTo = document.getElementById('dateToFilter').value;
+      const amountFilter = document.getElementById('amountFilter').value;
+      
+      // Filter transactions
+      filteredTransactions = originalTransactions.filter(transaction => {
+        // Year filter
+        if (currentYearFilter !== 'all') {
+          if (!transaction.date) return false;
+          const transactionYear = new Date(transaction.date).getFullYear();
+          if (transactionYear !== currentYearFilter) return false;
+        }
+        
+        // Vendor filter
+        if (vendorFilter !== 'all' && transaction.payee !== vendorFilter) {
+          return false;
+        }
+        
+        // Date filter
+        if (dateFrom || dateTo) {
+          if (!transaction.date) return false;
+          
+          const transactionDate = new Date(transaction.date);
+          if (isNaN(transactionDate.getTime())) return false;
+          
+          if (dateFrom) {
+            const fromDate = new Date(dateFrom);
+            if (transactionDate < fromDate) return false;
+          }
+          if (dateTo) {
+            const toDate = new Date(dateTo);
+            toDate.setHours(23, 59, 59, 999);
+            if (transactionDate > toDate) return false;
+          }
+        }
+        
+        // Amount filter
+        if (amountFilter !== 'all') {
+          if (amountFilter.endsWith('+')) {
+            const min = parseFloat(amountFilter.slice(0, -1));
+            if (transaction.amount < min) return false;
+          } else {
+            const [minStr, maxStr] = amountFilter.split('-');
+            const min = parseFloat(minStr);
+            const max = parseFloat(maxStr);
+            if (transaction.amount < min || transaction.amount > max) return false;
+          }
+        }
+        
+        return true;
+      });
+      
+      // Update vendor summary based on filtered transactions
+      updateVendorSummary();
+      
+      // Update UI
+      updateTable();
+      updateCharts();
+      updateSummary();
+      updateVendorCards();
+    }
+    
+    function resetFilters() {
+      document.getElementById('vendorFilter').value = 'all';
+      document.getElementById('dateFromFilter').value = '';
+      document.getElementById('dateToFilter').value = '';
+      document.getElementById('amountFilter').value = 'all';
+      
+      // Reset year filter
+      filterByYear('all');
+      
+      // Remove selected class from all vendor cards
+      document.querySelectorAll('.vendor-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      filteredTransactions = [...originalTransactions];
+      filteredVendors = [...originalVendors];
+      
+      updateTable();
+      updateCharts();
+      updateSummary();
+      updateVendorCards();
+    }
+    
+    function filterByVendor(vendorName) {
+      document.getElementById('vendorFilter').value = vendorName;
+      
+      // Remove selected class from all vendor cards
+      document.querySelectorAll('.vendor-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selected class to clicked vendor card
+      document.querySelectorAll(`.vendor-card[data-vendor="${vendorName}"]`).forEach(card => {
+        card.classList.add('selected');
+      });
+      
+      applyFilters();
+    }
+    
+    function updateVendorSummary() {
+      if (!filteredTransactions || filteredTransactions.length === 0) {
+        filteredVendors = [];
+        return;
+      }
+
+      // Calculate vendor summary from filtered transactions
+      const vendorMap = {};
+      
+      filteredTransactions.forEach(transaction => {
+        const vendor = transaction.payee;
+        if (!vendorMap[vendor]) {
+          vendorMap[vendor] = {
+            total_amount: 0,
+            transaction_count: 0,
+            payee: vendor
+          };
+        }
+        vendorMap[vendor].total_amount += transaction.amount;
+        vendorMap[vendor].transaction_count++;
+      });
+      
+      filteredVendors = Object.values(vendorMap);
+      
+      // Calculate percentages
+      const total = filteredVendors.reduce((sum, v) => sum + v.total_amount, 0);
+      filteredVendors.forEach(vendor => {
+        vendor.percentage = total > 0 ? (vendor.total_amount / total) * 100 : 0;
+      });
+      
+      // Sort by amount descending
+      filteredVendors.sort((a, b) => b.total_amount - a.total_amount);
+    }
+    
+    function updateTable() {
+      const tbody = document.getElementById('transactionsBody');
+      tbody.innerHTML = '';
+      
+      if (!filteredTransactions || filteredTransactions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+              <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+              No transactions match the current filters
+            </td>
+          </tr>
+        `;
+        document.getElementById('tableCount').textContent = `Showing 0 of ${originalTransactions.length} transactions`;
+        return;
+      }
+      
+      filteredTransactions.forEach(transaction => {
+        const row = document.createElement('tr');
+        const transactionDate = transaction.date ? new Date(transaction.date) : null;
+        const year = transactionDate ? transactionDate.getFullYear() : 'N/A';
+        
+        row.setAttribute('data-vendor', transaction.payee || '');
+        row.setAttribute('data-date', transaction.date ? transaction.date.split('T')[0] : '');
+        row.setAttribute('data-year', year);
+        row.setAttribute('data-amount', transaction.amount);
+        
+        row.innerHTML = `
+          <td class="date-cell">${transaction.date ? transaction.date.split('T')[0] : 'N/A'}</td>
+          <td class="date-cell">${year}</td>
+          <td class="vendor-cell">${transaction.payee || 'Unknown'}</td>
+          <td>${transaction.narration || 'No description'}</td>
+          <td class="amount-cell">KSH ${formatCurrency(transaction.amount)}</td>
+          <td>${transaction.payment_mode || 'N/A'}</td>
+          <td class="no-print">
+            <button class="btn btn-primary btn-small" onclick="viewTransactionDetails(${transaction.id})" style="padding: 5px 10px; font-size: 12px;">
+              <i class="fas fa-eye"></i> View
+            </button>
+          </td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+      
+      document.getElementById('tableCount').textContent = `Showing ${filteredTransactions.length} of ${originalTransactions.length} transactions`;
+    }
+    
+    function updateCharts() {
+      if (vendorChart) {
+        vendorChart.data = getVendorChartData();
+        vendorChart.update();
+      }
+      
+      if (monthlyChart) {
+        monthlyChart.data = getMonthlyChartData();
+        monthlyChart.update();
+      }
+    }
+    
+    function updateSummary() {
+      const totalExpenses = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
+      const avgTransaction = filteredTransactions.length > 0 ? totalExpenses / filteredTransactions.length : 0;
+      const topVendor = filteredVendors[0];
+      
+      document.getElementById('totalExpenses').textContent = `KSH ${formatCurrency(totalExpenses)}`;
+      document.getElementById('transactionCount').textContent = formatNumber(filteredTransactions.length);
+      document.getElementById('topVendorAmount').textContent = `KSH ${formatCurrency(topVendor ? topVendor.total_amount : 0)}`;
+      document.getElementById('vendorCount').textContent = formatNumber(filteredVendors.length);
+      document.getElementById('averagePayment').textContent = `KSH ${formatCurrency(avgTransaction)}`;
+      document.getElementById('filteredCount').textContent = formatNumber(filteredTransactions.length);
+      document.getElementById('vendorCountBadge').textContent = formatNumber(filteredVendors.length);
+    }
+    
+    function updateVendorCards() {
+      const vendorGrid = document.getElementById('vendorGrid');
+      vendorGrid.innerHTML = '';
+      
+      if (!filteredVendors || filteredVendors.length === 0) {
+        vendorGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+            <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+            No vendors match the current filters
+          </div>
+        `;
+        return;
+      }
+      
+      filteredVendors.forEach(vendor => {
+        const card = document.createElement('div');
+        card.className = 'vendor-card';
+        card.setAttribute('data-vendor', vendor.payee);
+        card.onclick = () => filterByVendor(vendor.payee);
+        
+        card.innerHTML = `
+          <div class="vendor-name">${vendor.payee}</div>
+          <div class="vendor-amount">KSH ${formatCurrency(vendor.total_amount)}</div>
+          <div class="vendor-count">${vendor.transaction_count} payment${vendor.transaction_count !== 1 ? 's' : ''}</div>
+          <div class="vendor-percentage">
+            ${vendor.percentage ? vendor.percentage.toFixed(1) : '0.0'}% of total
+          </div>
+        `;
+        
+        vendorGrid.appendChild(card);
+      });
+    }
+    
+    function sortVendors() {
+      const sortValue = document.getElementById('vendorSort').value;
+      
+      if (!filteredVendors) return;
+      
+      switch(sortValue) {
+        case 'amount-desc':
+          filteredVendors.sort((a, b) => b.total_amount - a.total_amount);
+          break;
+        case 'amount-asc':
+          filteredVendors.sort((a, b) => a.total_amount - b.total_amount);
+          break;
+        case 'name-asc':
+          filteredVendors.sort((a, b) => (a.payee || '').localeCompare(b.payee || ''));
+          break;
+        case 'name-desc':
+          filteredVendors.sort((a, b) => (b.payee || '').localeCompare(a.payee || ''));
+          break;
+      }
+      
+      updateVendorCards();
+    }
+    
+    function sortTable() {
+      const sortValue = document.getElementById('tableSort').value;
+      
+      if (!filteredTransactions) return;
+      
+      filteredTransactions.sort((a, b) => {
+        switch(sortValue) {
+          case 'date-desc':
+            return new Date(b.date || 0) - new Date(a.date || 0);
+          case 'date-asc':
+            return new Date(a.date || 0) - new Date(b.date || 0);
+          case 'amount-desc':
+            return b.amount - a.amount;
+          case 'amount-asc':
+            return a.amount - b.amount;
+          case 'vendor-asc':
+            return (a.payee || '').localeCompare(b.payee || '');
+          default:
+            return 0;
+        }
+      });
+      
+      updateTable();
+    }
+    
+    function viewTransactionDetails(transactionId) {
+      const modalContent = document.getElementById('modalContent');
+      const transaction = originalTransactions.find(t => t.id === transactionId);
+      
+      if (transaction) {
+        const transactionDate = transaction.date ? new Date(transaction.date) : null;
+        const year = transactionDate ? transactionDate.getFullYear() : 'N/A';
+        
+        modalContent.innerHTML = `
+          <div style="font-size: 14px; line-height: 1.8;">
+            <p><strong>Date:</strong> ${transaction.date ? transaction.date.split('T')[0] : 'N/A'}</p>
+            <p><strong>Year:</strong> ${year}</p>
+            <p><strong>Vendor:</strong> ${transaction.payee || 'Unknown'}</p>
+            <p><strong>Description:</strong> ${transaction.narration || 'No description'}</p>
+            <p><strong>Amount:</strong> KSH ${formatCurrency(transaction.amount)}</p>
+            <p><strong>Payment Method:</strong> ${transaction.payment_mode || 'N/A'}</p>
+            <p><strong>Transaction ID:</strong> #${transactionId}</p>
+          </div>
+          <div style="margin-top: 20px; text-align: center;">
+            <button class="btn btn-primary" onclick="printTransaction(${transactionId})" style="margin-right: 10px;">
+              <i class="fas fa-print"></i> Print Receipt
+            </button>
+            <button class="btn btn-secondary" onclick="closeModal()">
+              <i class="fas fa-times"></i> Close
+            </button>
+          </div>
+        `;
+      } else {
+        modalContent.innerHTML = `
+          <div style="text-align: center; padding: 20px; color: #666;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #f39c12; margin-bottom: 20px;"></i>
+            <p>Transaction details not found.</p>
+          </div>
+          <div style="margin-top: 20px; text-align: center;">
+            <button class="btn btn-secondary" onclick="closeModal()">
+              <i class="fas fa-times"></i> Close
+            </button>
+          </div>
+        `;
+      }
+      
+      document.getElementById('transactionModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+      document.getElementById('transactionModal').style.display = 'none';
+    }
+    
+    function printTransaction(transactionId) {
+      const printWindow = window.open('', '_blank');
+      const transaction = originalTransactions.find(t => t.id === transactionId);
+      
+      if (transaction) {
+        const transactionDate = transaction.date ? new Date(transaction.date) : null;
+        const year = transactionDate ? transactionDate.getFullYear() : 'N/A';
+        
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Transaction Receipt #${transactionId}</title>
+              <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                .receipt { max-width: 600px; margin: 0 auto; }
+                .header { text-align: center; margin-bottom: 30px; }
+                .details { margin-bottom: 30px; }
+                .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+                table { width: 100%; border-collapse: collapse; }
+                td { padding: 8px; border-bottom: 1px solid #ddd; }
+                .total { font-weight: bold; }
+              </style>
+            </head>
+            <body>
+              <div class="receipt">
+                <div class="header">
+                  <h1>Plateau Cluster</h1>
+                  <h2>Transaction Receipt - ${year}</h2>
+                </div>
+                <div class="details">
+                  <table>
+                    <tr><td><strong>Transaction ID:</strong></td><td>#${transactionId}</td></tr>
+                    <tr><td><strong>Date:</strong></td><td>${transaction.date ? transaction.date.split('T')[0] : 'N/A'}</td></tr>
+                    <tr><td><strong>Year:</strong></td><td>${year}</td></tr>
+                    <tr><td><strong>Vendor:</strong></td><td>${transaction.payee || 'Unknown'}</td></tr>
+                    <tr><td><strong>Description:</strong></td><td>${transaction.narration || 'No description'}</td></tr>
+                    <tr><td><strong>Payment Method:</strong></td><td>${transaction.payment_mode || 'N/A'}</td></tr>
+                    <tr class="total"><td><strong>Amount:</strong></td><td>KSH ${formatCurrency(transaction.amount)}</td></tr>
+                  </table>
+                </div>
+                <div class="footer">
+                  <p>Generated on ${new Date().toLocaleDateString()}</p>
+                  <p>Plateau Cluster Management System</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+      }
+    }
+    
+    function exportToExcel() {
+      if (!filteredTransactions || filteredTransactions.length === 0) {
+        alert('No data to export. Please apply filters to see transactions.');
+        return;
+      }
+      
+      // Create CSV content
+      let csvContent = "Date,Year,Vendor,Description,Amount,Payment Method\n";
+      
+      filteredTransactions.forEach(transaction => {
+        const transactionDate = transaction.date ? new Date(transaction.date) : null;
+        const year = transactionDate ? transactionDate.getFullYear() : 'N/A';
+        
+        const row = [
+          transaction.date ? transaction.date.split('T')[0] : '',
+          year,
+          `"${(transaction.payee || '').replace(/"/g, '""')}"`,
+          `"${(transaction.narration || '').replace(/"/g, '""')}"`,
+          transaction.amount,
+          `"${(transaction.payment_mode || '').replace(/"/g, '""')}"`
+        ];
+        csvContent += row.join(',') + '\n';
+      });
+      
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `fund_utilization_${currentYearFilter === 'all' ? 'all_years' : currentYearFilter}_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      alert('Data exported successfully as CSV file!');
+    }
+    
+    // Helper functions
+    function formatCurrency(value) {
+      if (isNaN(value) || !isFinite(value)) return '0.00';
+      return value.toLocaleString('en-KE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+    
+    function formatNumber(value) {
+      if (isNaN(value) || !isFinite(value)) return '0';
+      return value.toLocaleString('en-KE');
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('transactionModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+    
+    // Initialize date filters with current month
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date();
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      
+      document.getElementById('dateFromFilter').value = firstDay.toISOString().split('T')[0];
+      document.getElementById('dateToFilter').value = lastDay.toISOString().split('T')[0];
+    });
+  </script>
 </body>
 </html>
