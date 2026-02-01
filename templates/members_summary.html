@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Financial Summary - Estate Portal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: #2c3e50;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #3498db;
+        }
+
+        nav a.active {
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        /* Summary Section */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .summary-item {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .summary-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-item strong {
+            display: block;
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-item span {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        .summary-item i {
+            font-size: 1.5rem;
+            margin-top: 0.5rem;
+            color: #555;
+        }
+
+        .negative {
+            color: #e74c3c !important;
+        }
+
+        .positive {
+            color: #27ae60 !important;
+        }
+
+        /* Card Containers */
+        .card {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #f1f1f1;
+            padding-bottom: 0.75rem;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            text-align: left;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: #fff;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+        }
+
+        tr {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        td {
+            font-size: 0.875rem;
+            color: #555;
+        }
+
+        /* Button Styling */
+        .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .button-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .button-success {
+            background-color: #27ae60;
+        }
+
+        .button-success:hover {
+            background-color: #219653;
+        }
+
+        .button-warning {
+            background-color: #f39c12;
+        }
+
+        .button-warning:hover {
+            background-color: #d68910;
+        }
+
+        .button-info {
+            background-color: #3498db;
+        }
+
+        .button-info:hover {
+            background-color: #2980b9;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-paid {
+            background-color: rgba(39, 174, 96, 0.15);
+            color: #27ae60;
+        }
+
+        .status-pending {
+            background-color: rgba(243, 156, 18, 0.15);
+            color: #b06c0f;
+        }
+
+        .status-overdue {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+        }
+
+        /* Search and Filter */
+        .search-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .filter-select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: white;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            nav a {
+                margin: 0 0.5rem;
+                font-size: 14px;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+        }
+
+        /* Row click styling */
+        .clickable-row {
+            cursor: pointer;
+        }
+
+        .clickable-row:hover {
+            background-color: #e8f4fc !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        {% if 'user_id' not in session %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}">My Dashboard</a>
+            <a href="{{ url_for('admin_add_payment') }}">Add Payment</a>
+            <a href="{{ url_for('fund_utilization_view') }}">Funds</a>
+            <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+            <a href="{{ url_for('members_summary') }}" class="active">Members Summary</a>
+            <a href="{{ url_for('user_management') }}">User Management</a>
+            <a href="{{ url_for('payment_records') }}">Payment Records</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Members Financial Summary</h1>
+        <p>Detailed overview of all members' financial status for {{ current_year }}</p>
+
+        <!-- Summary Statistics -->
+        <h2>Summary Statistics</h2>
+        <div class="summary">
+            <div class="summary-item">
+                <strong>Total Members</strong>
+                <span>{{ summary_totals.member_count }}</span>
+                <i class="fas fa-users" style="color: #3498db;"></i>
+            </div>
+            
+            <div class="summary-item">
+                <strong>Total Opening Balance</strong>
+                <span class="{{ 'positive' if summary_totals.total_opening >= 0 else 'negative' }}">
+                    KSHS {{ summary_totals.total_opening | format_currency }}
+                </span>
+                <i class="fas fa-wallet" style="color: #3498db;"></i>
+            </div>
+            
+            <div class="summary-item">
+                <strong>Total Paid</strong>
+                <span class="positive">KSHS {{ summary_totals.total_paid | format_currency }}</span>
+                <i class="fas fa-money-bill-wave" style="color: #27ae60;"></i>
+            </div>
+            
+            <div class="summary-item">
+                <strong>Total Arrears</strong>
+                <span class="negative">KSHS {{ summary_totals.total_arrears | format_currency }}</span>
+                <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
+            </div>
+
+            <div class="summary-item">
+                <strong>Total Pending</strong>
+                <span>KSHS {{ summary_totals.total_pending | format_currency }}</span>
+                <i class="fas fa-calendar-alt" style="color: #f39c12;"></i>
+            </div>
+        </div>
+
+        <!-- Members Financial Summary Table -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Members Financial Details</h3>
+                <div class="search-filter">
+                    <input type="text" id="searchInput" class="search-box" placeholder="Search by name, username, or house number..." onkeyup="searchTable()">
+                    <select id="statusFilter" class="filter-select" onchange="filterTable()">
+                        <option value="all">All Status</option>
+                        <option value="overdue">Overdue Only</option>
+                        <option value="pending">Pending Only</option>
+                        <option value="paid">Paid Only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="membersTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Username</th>
+                            <th>Name</th>
+                            <th>House</th>
+                            <th>Opening</th>
+                            <th>Paid</th>
+                            <th>Arrears</th>
+                            <th>Pending</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user_financial in user_financials %}
+                        <tr class="clickable-row" onclick="window.location.href='{{ url_for('user_payment_summary', user_id=user_financial.user_id) }}'">
+                            <td>{{ loop.index }}</td>
+                            <td>{{ user_financial.username }}</td>
+                            <td>{{ user_financial.first_name }} {{ user_financial.last_name }}</td>
+                            <td>{{ user_financial.house_number }}</td>
+                            <td class="{{ 'positive' if user_financial.opening_balance >= 0 else 'negative' }}">
+                                {{ user_financial.opening_balance | format_currency }}
+                            </td>
+                            <td>{{ user_financial.total_paid | format_currency }}</td>
+                            <td class="negative">{{ user_financial.arrears | format_currency }}</td>
+                            <td>{{ user_financial.pending | format_currency }}</td>
+                            <td>
+                                {% if user_financial.arrears > 0 %}
+                                    <span class="status-badge status-overdue">Overdue</span>
+                                {% elif user_financial.pending > 0 %}
+                                    <span class="status-badge status-pending">Pending</span>
+                                {% else %}
+                                    <span class="status-badge status-paid">Paid</span>
+                                {% endif %}
+                            </td>
+                            <td class="action-buttons" onclick="event.stopPropagation();">
+                                <a href="{{ url_for('send_reminder', user_id=user_financial.user_id) }}" 
+                                   class="button button-small button-warning"
+                                   title="Send Reminder Email">
+                                    <i class="fas fa-bell"></i>
+                                </a>
+                                <a href="{{ url_for('user_payment_summary', user_id=user_financial.user_id) }}" 
+                                   class="button button-small button-info"
+                                   title="View Payment Statement">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div style="margin-top: 1rem; text-align: center; color: #666;">
+                    <p><i class="fas fa-info-circle"></i> Click on any row to view detailed payment summary for that member</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Options -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Export Options</h3>
+            </div>
+            <div style="text-align: center; padding: 1rem;">
+                <button onclick="exportToExcel()" class="button button-success">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </button>
+                <button onclick="printSummary()" class="button button-info">
+                    <i class="fas fa-print"></i> Print Summary
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for functionality -->
+    <script>
+        // Search function
+        function searchTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById("membersTable");
+            const rows = table.getElementsByTagName("tr");
+            
+            for (let i = 1; i < rows.length; i++) { // Start from 1 to skip header
+                const row = rows[i];
+                const cells = row.getElementsByTagName("td");
+                let found = false;
+                
+                for (let j = 0; j < cells.length; j++) {
+                    const cell = cells[j];
+                    if (cell) {
+                        const text = cell.textContent || cell.innerText;
+                        if (text.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                row.style.display = found ? "" : "none";
+            }
+        }
+        
+        // Filter function
+        function filterTable() {
+            const filter = document.getElementById("statusFilter").value;
+            const table = document.getElementById("membersTable");
+            const rows = table.getElementsByTagName("tr");
+            
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const statusCell = row.getElementsByTagName("td")[8]; // Status column
+                
+                if (filter === "all") {
+                    row.style.display = "";
+                } else if (statusCell) {
+                    const statusText = statusCell.textContent || statusCell.innerText;
+                    if (filter === "overdue" && statusText.includes("Overdue")) {
+                        row.style.display = "";
+                    } else if (filter === "pending" && statusText.includes("Pending")) {
+                        row.style.display = "";
+                    } else if (filter === "paid" && statusText.includes("Paid")) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                }
+            }
+        }
+        
+        // Export to Excel function
+        function exportToExcel() {
+            // This is a simplified version - in production, you'd want to use a library like SheetJS
+            alert("Export to Excel functionality would be implemented here. For now, use your browser's print feature.");
+        }
+        
+        // Print summary function
+        function printSummary() {
+            window.print();
+        }
+        
+        // Sort table by column
+        let sortDirection = true;
+        function sortTable(n) {
+            const table = document.getElementById("membersTable");
+            let rows, switching, i, x, y, shouldSwitch;
+            switching = true;
+            
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[n];
+                    y = rows[i + 1].getElementsByTagName("td")[n];
+                    
+                    if (sortDirection) {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+            sortDirection = !sortDirection;
+        }
+        
+        // Initialize table sorting
+        document.addEventListener('DOMContentLoaded', function() {
+            const headers = document.querySelectorAll('#membersTable th');
+            headers.forEach((header, index) => {
+                if (index < headers.length - 1) { // Don't add sorting to actions column
+                    header.style.cursor = 'pointer';
+                    header.addEventListener('click', () => sortTable(index));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
